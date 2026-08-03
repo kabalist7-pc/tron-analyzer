@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tron Analyzer</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:Arial,sans-serif;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#00e5ff;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+}
+
+input{
+width:100%;
+padding:15px;
+font-size:16px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+box-sizing:border-box;
+}
+
+button{
+margin-top:15px;
+width:100%;
+padding:15px;
+background:#00bcd4;
+color:white;
+border:none;
+border-radius:10px;
+font-size:18px;
+font-weight:bold;
+}
+
+.result{
+margin-top:20px;
+line-height:30px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🎲 Tron Analyzer</h1>
+
+<div class="card">
+
+<h3>Provably Fair</h3>
+
+<input
+id="pfLink"
+placeholder="Collez ici un lien Provably Fair">
+
+<button onclick="analyse()">
+
+Analyser
+
+</button>
+
+<div class="result">
+
+<p><b>Game :</b> <span id="game">-</span></p>
+
+<p><b>Nonce :</b> <span id="nonce">-</span></p>
+
+<p><b>Server Seed :</b> <span id="server">-</span></p>
+
+</div>
+
+</div>
+
+<script>
+
+function analyse(){
+
+let link=document.getElementById("pfLink").value;
+
+try{
+
+let url=new URL(link);
+
+document.getElementById("game").innerHTML=url.searchParams.get("game");
+
+document.getElementById("nonce").innerHTML=url.searchParams.get("nonce");
+
+document.getElementById("server").innerHTML=url.searchParams.get("server_seed");
+
+}catch(e){
+
+alert("Lien invalide");
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
