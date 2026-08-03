@@ -1,16 +1,50 @@
+/*
+=====================================================
+TRON ANALYZER
+Version : 1.0
+Fichier : statistics.js
+=====================================================
+*/
+
+"use strict";
+
 class StatisticsService {
 
     static refresh() {
 
-        const total = HistoryService.count();
+        const history = StorageService.getHistory();
 
-        console.log("Analyses :", total);
+        const stats = {
 
-        return {
+            analyses: history.length,
 
-            analyses: total
+            dice: 0,
+
+            latestNonce: "-",
+
+            latestGame: "-",
+
+            latestDate: "-"
 
         };
+
+        if (history.length > 0) {
+
+            stats.latestNonce = history[0].nonce || "-";
+
+            stats.latestGame = history[0].game || "-";
+
+            stats.latestDate = history[0].createdAt || "-";
+
+            stats.dice = history.filter(
+
+                item => item.game === "Dice"
+
+            ).length;
+
+        }
+
+        return stats;
 
     }
 
