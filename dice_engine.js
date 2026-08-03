@@ -1,24 +1,36 @@
+/*
+=========================================================
+TRON ANALYZER
+Version : 2.3
+Fichier : dice_engine.js
+=========================================================
+*/
+
+"use strict";
+
 class DiceEngine {
 
-    static analyze(data) {
+    /**
+     * Reproduit le calcul Dice de Tronpick
+     */
+    static async calculate(serverSeed, clientSeed, nonce) {
 
-        return {
+        const message = clientSeed + ":" + nonce;
 
-            valid: true,
+        const bytes = await CryptoEngine.hmacSHA256(
+            message,
+            serverSeed
+        );
 
-            game: data.game,
+        const value =
+            (bytes[0] / 256) +
+            (bytes[1] / (256 * 256)) +
+            (bytes[2] / (256 * 256 * 256)) +
+            (bytes[3] / (256 * 256 * 256 * 256));
 
-            nonce: data.nonce,
+        const number = parseInt(value * 10000);
 
-            serverSeed: data.serverSeed,
-
-            clientSeed: data.clientSeed || "-",
-
-            hash: data.hash || "-",
-
-            message: "Lien Provably Fair analysé avec succès."
-
-        };
+        return (number / 100).toFixed(2);
 
     }
 
