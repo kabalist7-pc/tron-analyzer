@@ -1,7 +1,7 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 1.0
+Version : 2.0
 Fichier : parser.js
 =====================================================
 */
@@ -14,29 +14,62 @@ function parseProvablyFairLink(link) {
 
         const url = new URL(link);
 
+        // Vérifie que le lien provient bien de Tronpick
+        if (!url.hostname.includes("tronpick.io")) {
+            throw new Error("Lien Tronpick invalide");
+        }
+
+        const game = url.searchParams.get("game") || "";
+
+        const nonce =
+            url.searchParams.get("nonce") ||
+            url.searchParams.get("round") ||
+            "";
+
+        const serverSeed =
+            url.searchParams.get("server_seed") || "";
+
+        const clientSeed =
+            url.searchParams.get("client_seed") || "";
+
+        const hash =
+            url.searchParams.get("hash") || "";
+
         return {
 
             url: link,
 
-            game: url.searchParams.get("game") || "",
+            game,
 
-            nonce: url.searchParams.get("nonce") || "",
+            nonce,
 
-            serverSeed: url.searchParams.get("server_seed") || "",
+            serverSeed,
 
-            clientSeed: url.searchParams.get("client_seed") || "",
+            clientSeed,
 
-            hash: url.searchParams.get("hash") || "",
+            hash,
 
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+
+            valid:
+                game !== "" &&
+                serverSeed !== ""
 
         };
 
-    } catch (e) {
+    }
 
-        console.error("Erreur du parseur :", e);
+    catch (error) {
 
-        return null;
+        console.error(error);
+
+        return {
+
+            valid: false,
+
+            error: error.message
+
+        };
 
     }
 
