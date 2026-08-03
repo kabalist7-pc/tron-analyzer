@@ -1,118 +1,95 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
 <title>Tron Analyzer</title>
 
-<style>
-
-body{
-background:#0f172a;
-color:white;
-font-family:Arial,sans-serif;
-margin:0;
-padding:20px;
-}
-
-h1{
-text-align:center;
-color:#00e5ff;
-}
-
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-}
-
-input{
-width:100%;
-padding:15px;
-font-size:16px;
-border-radius:10px;
-border:none;
-margin-top:10px;
-box-sizing:border-box;
-}
-
-button{
-margin-top:15px;
-width:100%;
-padding:15px;
-background:#00bcd4;
-color:white;
-border:none;
-border-radius:10px;
-font-size:18px;
-font-weight:bold;
-}
-
-.result{
-margin-top:20px;
-line-height:30px;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
+<header>
+
 <h1>🎲 Tron Analyzer</h1>
 
-<div class="card">
+<p>
+Analyse Provably Fair
+</p>
 
-<h3>Provably Fair</h3>
+</header>
+
+<main>
+
+<section class="card">
+
+<h2>Entrée</h2>
 
 <input
 id="pfLink"
-placeholder="Collez ici un lien Provably Fair">
+type="text"
+placeholder="Collez un lien Provably Fair">
 
 <button onclick="analyse()">
-
 Analyser
-
 </button>
 
-<div class="result">
+</section>
 
-<p><b>Game :</b> <span id="game">-</span></p>
+<section class="card">
 
-<p><b>Nonce :</b> <span id="nonce">-</span></p>
+<h2>Informations</h2>
 
-<p><b>Server Seed :</b> <span id="server">-</span></p>
+<div class="row">
+<span>Game</span>
+<span id="game">-</span>
+</div>
+
+<div class="row">
+<span>Nonce</span>
+<span id="nonce">-</span>
+</div>
+
+<div class="row">
+<span>Server Seed</span>
+<span id="server">-</span>
+</div>
+
+<div class="row">
+<span>Client Seed</span>
+<span id="client">-</span>
+</div>
+
+<div class="row">
+<span>Hash</span>
+<span id="hash">-</span>
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>Vérification</h2>
+
+<div id="verification">
+
+Prêt.
 
 </div>
 
-</div>
+</section>
 
-<script>
+</main>
 
-function analyse(){
-
-let link=document.getElementById("pfLink").value;
-
-try{
-
-let url=new URL(link);
-
-document.getElementById("game").innerHTML=url.searchParams.get("game");
-
-document.getElementById("nonce").innerHTML=url.searchParams.get("nonce");
-
-document.getElementById("server").innerHTML=url.searchParams.get("server_seed");
-
-}catch(e){
-
-alert("Lien invalide");
-
-}
-
-}
-
-</script>
+<script src="parser.js"></script>
+<script src="app.js"></script>
 
 </body>
 
