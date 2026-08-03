@@ -1,3 +1,13 @@
+/*
+=====================================================
+TRON ANALYZER
+Version : 1.0
+Fichier : parser.js
+=====================================================
+*/
+
+"use strict";
+
 function parseProvablyFairLink(link) {
 
     try {
@@ -5,6 +15,8 @@ function parseProvablyFairLink(link) {
         const url = new URL(link);
 
         return {
+
+            url: link,
 
             game: url.searchParams.get("game") || "",
 
@@ -14,11 +26,15 @@ function parseProvablyFairLink(link) {
 
             clientSeed: url.searchParams.get("client_seed") || "",
 
-            hash: url.searchParams.get("hash") || ""
+            hash: url.searchParams.get("hash") || "",
+
+            createdAt: new Date().toISOString()
 
         };
 
     } catch (e) {
+
+        console.error("Erreur du parseur :", e);
 
         return null;
 
