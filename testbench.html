@@ -1,1 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Tron Analyzer - TestBench</title>
+
+<style>
+
+body{
+
+font-family:Arial,Helvetica,sans-serif;
+
+background:#111827;
+
+color:white;
+
+padding:20px;
+
+}
+
+h1{
+
+color:#00d4ff;
+
+}
+
+button{
+
+padding:12px 25px;
+
+font-size:16px;
+
+cursor:pointer;
+
+margin-top:20px;
+
+}
+
+pre{
+
+margin-top:20px;
+
+background:#1f2937;
+
+padding:15px;
+
+border-radius:10px;
+
+white-space:pre-wrap;
+
+word-break:break-word;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Tron Analyzer TestBench</h1>
+
+<p>
+
+Validation du moteur cryptographique
+
+</p>
+
+<button onclick="runCryptoTest()">
+
+Lancer le test
+
+</button>
+
+<pre id="output">
+
+En attente...
+
+</pre>
+
+<script src="crypto_engine.js"></script>
+
+<script src="testbench.js"></script>
+
+<script>
+
+const oldLog = console.log;
+
+console.log = function(){
+
+oldLog.apply(console,arguments);
+
+let txt="";
+
+for(let i=0;i<arguments.length;i++){
+
+txt+=arguments[i]+" ";
+
+}
+
+document.getElementById("output").textContent+=txt+"\n";
+
+};
+
+document.getElementById("output").textContent="";
+
+</script>
+
+</body>
+
+</html>
