@@ -1,9 +1,9 @@
 /*
 =========================================================
 TRON ANALYZER
-Version : 2.2
+Version : 3.0
 Fichier : crypto_engine.js
-Auteur : OpenAI
+Livraison : Sprint 1 - Partie 1
 =========================================================
 */
 
@@ -11,43 +11,106 @@ Auteur : OpenAI
 
 class CryptoEngine {
 
-    /**
-     * Convertit une chaîne UTF-8 en Uint8Array
+    /*
+     * Encode une chaîne UTF-8
      */
     static encoder(text) {
         return new TextEncoder().encode(text);
     }
 
-    /**
-     * Convertit ArrayBuffer -> tableau d'octets
+    /*
+     * Convertit ArrayBuffer -> Uint8Array
      */
-    static toBytes(buffer) {
-        return Array.from(new Uint8Array(buffer));
+    static toUint8(buffer) {
+        return new Uint8Array(buffer);
     }
 
-    /**
-     * Calcule HMAC SHA-256
+    /*
+     * Convertit Uint8Array -> Tableau JS
      */
-    static async hmacSHA256(message, key) {
+    static toArray(bytes) {
+        return Array.from(bytes);
+    }
 
-        const cryptoKey = await crypto.subtle.importKey(
-            "raw",
-            this.encoder(key),
-            {
-                name: "HMAC",
-                hash: "SHA-256"
-            },
-            false,
-            ["sign"]
-        );
+    /*
+     * Convertit les octets en HEX
+     */
+    static toHex(bytes) {
 
-        const signature = await crypto.subtle.sign(
-            "HMAC",
-            cryptoKey,
-            this.encoder(message)
-        );
+        return bytes
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
 
-        return this.toBytes(signature);
+    }
+
+    /*
+     * Convertit les octets en Base64
+     */
+    static toBase64(bytes) {
+
+        let binary = "";
+
+        bytes.forEach(b => {
+
+            binary += String.fromCharCode(b);
+
+        });
+
+        return btoa(binary);
+
+    }
+
+    /*
+     * HMAC SHA-256
+     */
+    static async hmac(message, key) {
+
+        const cryptoKey =
+            await crypto.subtle.importKey(
+
+                "raw",
+
+                this.encoder(key),
+
+                {
+
+                    name: "HMAC",
+
+                    hash: "SHA-256"
+
+                },
+
+                false,
+
+                ["sign"]
+
+            );
+
+        const signature =
+            await crypto.subtle.sign(
+
+                "HMAC",
+
+                cryptoKey,
+
+                this.encoder(message)
+
+            );
+
+        const bytes =
+            this.toArray(
+                this.toUint8(signature)
+            );
+
+        return {
+
+            bytes,
+
+            hex: this.toHex(bytes),
+
+            base64: this.toBase64(bytes)
+
+        };
 
     }
 
