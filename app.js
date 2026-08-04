@@ -1,19 +1,68 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 3.0
+Version : 4.0
 Fichier : app.js
 =====================================================
 */
 
 "use strict";
 
+function refreshHistory() {
+
+    const container =
+        document.getElementById("history");
+
+    if (!container) return;
+
+    if (typeof StorageService === "undefined") {
+
+        container.innerHTML =
+            "Storage indisponible.";
+
+        return;
+
+    }
+
+    const history =
+        StorageService.getHistory();
+
+    if (history.length === 0) {
+
+        container.innerHTML =
+            "Aucune analyse enregistrée.";
+
+        return;
+
+    }
+
+    let html = "";
+
+    history.forEach(item => {
+
+        html +=
+        "<div class='row'>" +
+        "<span>" +
+        item.nonce +
+        "</span>" +
+        "<span>" +
+        item.result +
+        "</span>" +
+        "</div>";
+
+    });
+
+    container.innerHTML = html;
+
+}
+
 async function analyse() {
 
     const verification =
         document.getElementById("verification");
 
-    verification.innerHTML = "Analyse en cours...";
+    verification.innerHTML =
+        "Analyse en cours...";
 
     try {
 
@@ -59,19 +108,6 @@ async function analyse() {
         document.getElementById("hash").textContent =
             data.hash || "-";
 
-        if (
-            !data.serverSeed ||
-            !data.clientSeed ||
-            !data.nonce
-        ) {
-
-            verification.innerHTML =
-                "❌ Paramètres insuffisants pour calculer le résultat.";
-
-            return;
-
-        }
-
         const result =
             await DiceEngine.calculate(
 
@@ -89,23 +125,17 @@ async function analyse() {
 
             result.dice +
 
-            "<br><br>" +
+            "<br><br>✅ Calcul effectué avec succès.";
 
-            "✅ Calcul effectué avec succès.";
+        StorageService.saveAnalysis({
 
-        if (
-            typeof StorageService !== "undefined"
-        ) {
+            ...data,
 
-            StorageService.saveAnalysis({
+            result: result.dice
 
-                ...data,
+        });
 
-                result: result.dice
-
-            });
-
-        }
+        refreshHistory();
 
     }
 
@@ -114,11 +144,16 @@ async function analyse() {
         console.error(error);
 
         verification.innerHTML =
-
-            "❌ Erreur : " +
-
-            error.message;
+            "❌ " + error.message;
 
     }
 
 }
+
+window.addEventListener(
+
+    "load",
+
+    refreshHistory
+
+);
