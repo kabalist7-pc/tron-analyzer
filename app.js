@@ -1,7 +1,7 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 2.0
+Version : 3.0
 Fichier : app.js
 =====================================================
 */
@@ -10,76 +10,114 @@ Fichier : app.js
 
 async function analyse() {
 
-    const input = document
-        .getElementById("pfLink")
-        .value
-        .trim();
+    const verification =
+        document.getElementById("verification");
 
-    if (!input) {
+    verification.innerHTML = "Analyse en cours...";
 
-        alert("Veuillez coller un lien Provably Fair.");
+    try {
 
-        return;
+        const input =
+            document
+            .getElementById("pfLink")
+            .value
+            .trim();
 
-    }
+        if (!input) {
 
-    const data = parseProvablyFairLink(input);
+            verification.innerHTML =
+                "❌ Veuillez coller un lien Provably Fair.";
 
-    if (!data || !data.valid) {
-
-        alert("Lien invalide.");
-
-        return;
-
-    }
-
-    document.getElementById("game").textContent =
-        data.game || "-";
-
-    document.getElementById("nonce").textContent =
-        data.nonce || "-";
-
-    document.getElementById("server").textContent =
-        data.serverSeed || "-";
-
-    document.getElementById("client").textContent =
-        data.clientSeed || "-";
-
-    document.getElementById("hash").textContent =
-        data.hash || "-";
-
-    if (
-        data.serverSeed !== "" &&
-        data.clientSeed !== "" &&
-        data.nonce !== ""
-    ) {
-
-        try {
-
-            const result =
-                await DiceEngine.calculate(
-                    data.serverSeed,
-                    data.clientSeed,
-                    data.nonce
-                );
-
-            document.getElementById(
-                "verification"
-            ).innerHTML =
-                "<b>Résultat calculé :</b> " + result;
+            return;
 
         }
 
-        catch (err) {
+        const data =
+            parseProvablyFairLink(input);
 
-            console.error(err);
+        if (!data.valid) {
 
-            document.getElementById(
-                "verification"
-            ).textContent =
-                "Erreur pendant le calcul.";
+            verification.innerHTML =
+                "❌ Lien invalide.";
+
+            return;
 
         }
+
+        document.getElementById("game").textContent =
+            data.game || "-";
+
+        document.getElementById("nonce").textContent =
+            data.nonce || "-";
+
+        document.getElementById("server").textContent =
+            data.serverSeed || "-";
+
+        document.getElementById("client").textContent =
+            data.clientSeed || "-";
+
+        document.getElementById("hash").textContent =
+            data.hash || "-";
+
+        if (
+            !data.serverSeed ||
+            !data.clientSeed ||
+            !data.nonce
+        ) {
+
+            verification.innerHTML =
+                "❌ Paramètres insuffisants pour calculer le résultat.";
+
+            return;
+
+        }
+
+        const result =
+            await DiceEngine.calculate(
+
+                data.serverSeed,
+
+                data.clientSeed,
+
+                data.nonce
+
+            );
+
+        verification.innerHTML =
+
+            "<b>Résultat :</b> " +
+
+            result.dice +
+
+            "<br><br>" +
+
+            "✅ Calcul effectué avec succès.";
+
+        if (
+            typeof StorageService !== "undefined"
+        ) {
+
+            StorageService.saveAnalysis({
+
+                ...data,
+
+                result: result.dice
+
+            });
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        verification.innerHTML =
+
+            "❌ Erreur : " +
+
+            error.message;
 
     }
 
