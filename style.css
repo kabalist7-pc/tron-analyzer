@@ -1,3 +1,11 @@
+/*
+=====================================================
+TRON ANALYZER
+Version : 2.0
+Fichier : style.css
+=====================================================
+*/
+
 body{
 
 margin:0;
@@ -37,6 +45,10 @@ color:#b8c1d1;
 main{
 
 padding:15px;
+
+max-width:900px;
+
+margin:auto;
 
 }
 
@@ -78,6 +90,10 @@ box-sizing:border-box;
 
 margin-top:10px;
 
+background:white;
+
+color:black;
+
 }
 
 button{
@@ -102,6 +118,8 @@ font-weight:bold;
 
 cursor:pointer;
 
+transition:.25s;
+
 }
 
 button:hover{
@@ -120,9 +138,9 @@ padding:10px 0;
 
 border-bottom:1px solid #31405a;
 
-word-break:break-word;
-
 gap:15px;
+
+word-break:break-word;
 
 }
 
@@ -135,5 +153,91 @@ background:#0f172a;
 border-radius:12px;
 
 min-height:60px;
+
+}
+
+/* =======================================
+Historique
+======================================= */
+
+#history{
+
+display:flex;
+
+flex-direction:column;
+
+gap:12px;
+
+}
+
+.history-item{
+
+background:#0f172a;
+
+border:1px solid #31405a;
+
+border-radius:12px;
+
+padding:14px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.history-item:hover{
+
+border-color:#00d9ff;
+
+transform:scale(1.01);
+
+}
+
+.history-title{
+
+font-size:18px;
+
+font-weight:bold;
+
+color:#00d9ff;
+
+margin-bottom:8px;
+
+}
+
+.history-date{
+
+font-size:13px;
+
+color:#9ca3af;
+
+margin-top:8px;
+
+}
+
+/* =======================================
+Responsive
+======================================= */
+
+@media(max-width:700px){
+
+header h1{
+
+font-size:30px;
+
+}
+
+.card{
+
+padding:16px;
+
+}
+
+button{
+
+font-size:16px;
+
+}
 
 }
