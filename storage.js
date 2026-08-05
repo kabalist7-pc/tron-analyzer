@@ -1,7 +1,7 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 1.0
+Version : 2.0
 Fichier : storage.js
 =====================================================
 */
@@ -10,7 +10,7 @@ Fichier : storage.js
 
 class StorageService {
 
-    static KEY = "tron_analyzer_history_v1";
+    static KEY = "tron_analyzer_history_v2";
 
     static getHistory() {
 
@@ -22,7 +22,9 @@ class StorageService {
 
             return JSON.parse(raw);
 
-        } catch (e) {
+        }
+
+        catch (e) {
 
             console.error(e);
 
@@ -36,12 +38,39 @@ class StorageService {
 
         const history = this.getHistory();
 
-        // Évite les doublons sur le nonce
-        const exists = history.find(item => item.nonce === data.nonce);
+        // Évite les doublons (jeu + nonce)
+        const exists = history.find(item =>
+
+            item.game === data.game &&
+            item.nonce === data.nonce
+
+        );
 
         if (exists) return;
 
-        history.unshift(data);
+        history.unshift({
+
+            game: data.game || "-",
+
+            nonce: data.nonce || "-",
+
+            result: data.result || "-",
+
+            serverSeed: data.serverSeed || "",
+
+            clientSeed: data.clientSeed || "",
+
+            hash: data.hash || "",
+
+            url: data.url || "",
+
+            createdAt:
+
+                data.createdAt ||
+
+                new Date().toISOString()
+
+        });
 
         localStorage.setItem(
 
