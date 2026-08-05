@@ -1,8 +1,9 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 4.0
+Version : 5.0
 Fichier : app.js
+Architecture Core V2
 =====================================================
 */
 
@@ -10,22 +11,11 @@ Fichier : app.js
 
 function refreshHistory() {
 
-    const container =
-        document.getElementById("history");
+    const container = document.getElementById("history");
 
     if (!container) return;
 
-    if (typeof StorageService === "undefined") {
-
-        container.innerHTML =
-            "Storage indisponible.";
-
-        return;
-
-    }
-
-    const history =
-        StorageService.getHistory();
+    const history = StorageService.getHistory();
 
     if (history.length === 0) {
 
@@ -38,17 +28,29 @@ function refreshHistory() {
 
     let html = "";
 
-    history.forEach(item => {
+    history.forEach((item,index)=>{
 
-        html +=
-        "<div class='row'>" +
-        "<span>" +
-        item.nonce +
-        "</span>" +
-        "<span>" +
-        item.result +
-        "</span>" +
-        "</div>";
+        html += `
+        <div class="history-item"
+             onclick="loadHistory(${index})"
+             style="
+                cursor:pointer;
+                border:1px solid #444;
+                padding:10px;
+                margin-bottom:8px;
+                border-radius:8px;
+             ">
+
+            <b>🎲 ${item.game}</b><br>
+
+            Nonce : ${item.nonce}<br>
+
+            Résultat : ${item.result}<br>
+
+            <small>${new Date(item.createdAt).toLocaleString()}</small>
+
+        </div>
+        `;
 
     });
 
@@ -56,7 +58,24 @@ function refreshHistory() {
 
 }
 
-async function analyse() {
+function loadHistory(index){
+
+    const history =
+        StorageService.getHistory();
+
+    const item =
+        history[index];
+
+    if(!item) return;
+
+    document.getElementById("pfLink").value =
+        item.url;
+
+    analyse();
+
+}
+
+async function analyse(){
 
     const verification =
         document.getElementById("verification");
@@ -64,96 +83,62 @@ async function analyse() {
     verification.innerHTML =
         "Analyse en cours...";
 
-    try {
+    const link =
+        document
+        .getElementById("pfLink")
+        .value
+        .trim();
 
-        const input =
-            document
-            .getElementById("pfLink")
-            .value
-            .trim();
-
-        if (!input) {
-
-            verification.innerHTML =
-                "❌ Veuillez coller un lien Provably Fair.";
-
-            return;
-
-        }
-
-        const data =
-            parseProvablyFairLink(input);
-
-        if (!data.valid) {
-
-            verification.innerHTML =
-                "❌ Lien invalide.";
-
-            return;
-
-        }
-
-        document.getElementById("game").textContent =
-            data.game || "-";
-
-        document.getElementById("nonce").textContent =
-            data.nonce || "-";
-
-        document.getElementById("server").textContent =
-            data.serverSeed || "-";
-
-        document.getElementById("client").textContent =
-            data.clientSeed || "-";
-
-        document.getElementById("hash").textContent =
-            data.hash || "-";
-
-        const result =
-            await DiceEngine.calculate(
-
-                data.serverSeed,
-
-                data.clientSeed,
-
-                data.nonce
-
-            );
+    if(!link){
 
         verification.innerHTML =
+            "❌ Veuillez coller un lien.";
 
-            "<b>Résultat :</b> " +
-
-            result.dice +
-
-            "<br><br>✅ Calcul effectué avec succès.";
-
-        StorageService.saveAnalysis({
-
-            ...data,
-
-            result: result.dice
-
-        });
-
-        refreshHistory();
+        return;
 
     }
 
-    catch (error) {
+    const analysis =
+        await AnalysisService.analyzeLink(link);
 
-        console.error(error);
+    if(!analysis.success){
 
         verification.innerHTML =
-            "❌ " + error.message;
+            "❌ " + analysis.error;
+
+        return;
 
     }
+
+    document.getElementById("game").textContent =
+        analysis.game;
+
+    document.getElementById("nonce").textContent =
+        analysis.nonce;
+
+    document.getElementById("server").textContent =
+        analysis.serverSeed;
+
+    document.getElementById("client").textContent =
+        analysis.clientSeed;
+
+    document.getElementById("hash").textContent =
+        analysis.hash || "-";
+
+    verification.innerHTML =
+
+        `<b>Résultat :</b>
+
+        ${analysis.result}
+
+        <br><br>
+
+        ✅ Vérification réussie`;
+
+    StorageService.saveAnalysis(analysis);
+
+    refreshHistory();
 
 }
 
-window.addEventListener(
-
-    "load",
-
-    refreshHistory
-
-);
+window.onload = refreshHistory;
