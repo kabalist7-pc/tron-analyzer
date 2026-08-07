@@ -194,5 +194,7 @@ window.onload = function(){
     refreshHistory();
 
     StatisticsService.refresh();
-StatisticsService.refreshDistribution();
-}
+
+    StatisticsService.refreshDistribution();
+
+};
