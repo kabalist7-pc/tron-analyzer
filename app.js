@@ -187,17 +187,20 @@ function clearHistory(){
         return;
     }
 
+    StorageService.clearHistory();
+
     refreshHistory();
 
-StatisticsService.refresh();
+    StatisticsService.refresh();
 
-StatisticsService.refreshDistribution();
+    StatisticsService.refreshDistribution();
 
-AdvancedStatisticsService.refresh();
+    AdvancedStatisticsService.refresh();
 
-ChiSquareService.refresh();
+    ChiSquareService.refresh();
 
-KolmogorovSmirnovService.refresh();
+    KolmogorovSmirnovService.refresh();
+
 }
 
 window.onload = function(){
