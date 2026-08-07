@@ -153,5 +153,19 @@ async function analyse(){
     refreshHistory();
 
 }
+function clearHistory(){
 
+    const confirmation = confirm(
+        "Voulez-vous vraiment supprimer tout l'historique ?"
+    );
+
+    if(!confirmation){
+        return;
+    }
+
+    StorageService.clearHistory();
+
+    refreshHistory();
+
+}
 window.onload = refreshHistory;
