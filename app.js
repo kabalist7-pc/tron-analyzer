@@ -167,7 +167,9 @@ async function analyse(){
 
     StorageService.saveAnalysis(analysis);
 
-    refreshHistory();
+refreshHistory();
+
+StatisticsService.refresh();
 
 }
 function clearHistory(){
@@ -180,7 +182,9 @@ function clearHistory(){
 
     StorageService.clearHistory();
 
-    refreshHistory();
+refreshHistory();
+
+StatisticsService.refresh();
 
 }
 
