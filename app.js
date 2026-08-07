@@ -12,10 +12,23 @@ Architecture Core V2
 function refreshHistory() {
 
     const container = document.getElementById("history");
+    const counter = document.getElementById("historyCounter");
 
     if (!container) return;
 
     const history = StorageService.getHistory();
+
+    // Mise à jour du compteur
+    if (counter) {
+
+        const total = history.length;
+
+        counter.textContent =
+            total <= 1
+                ? `${total} analyse`
+                : `${total} analyses`;
+
+    }
 
     if (history.length === 0) {
 
