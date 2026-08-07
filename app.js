@@ -17,7 +17,18 @@ function refreshHistory() {
     if (!container) return;
 
     const history = StorageService.getHistory();
+const counter = document.getElementById("historyCounter");
 
+if (counter) {
+
+    const total = history.length;
+
+    counter.textContent =
+        total <= 1
+            ? `${total} analyse`
+            : `${total} analyses`;
+
+}
     // Mise à jour du compteur
     if (counter) {
 
