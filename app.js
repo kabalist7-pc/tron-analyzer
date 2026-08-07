@@ -170,6 +170,7 @@ async function analyse(){
 refreshHistory();
 
 StatisticsService.refresh();
+
 StatisticsService.refreshDistribution();
 }
 function clearHistory(){
@@ -185,6 +186,7 @@ function clearHistory(){
 refreshHistory();
 
 StatisticsService.refresh();
+
 StatisticsService.refreshDistribution();
 
 }
