@@ -66,8 +66,33 @@ static chiSquare() {
 }
   static refresh() {
 
+    const chi = this.chiSquare();
+
     document.getElementById("chiSquareValue").textContent =
-        this.chiSquare().toFixed(2);
+        chi.toFixed(2);
+
+    let status = "En attente";
+
+    if (this.values().length < 100) {
+
+        status = "Échantillon insuffisant";
+
+    } else if (chi < 8) {
+
+        status = "🟢 Distribution proche de l'uniforme";
+
+    } else if (chi < 16.92) {
+
+        status = "🟡 Écart modéré";
+
+    } else {
+
+        status = "🔴 Écart important";
+
+    }
+
+    document.getElementById("chiSquareStatus").textContent =
+        status;
 
   }
 }
