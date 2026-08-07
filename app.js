@@ -176,6 +176,8 @@ StatisticsService.refreshDistribution();
 AdvancedStatisticsService.refresh();
 
 StreakStatisticsService.refresh();
+
+GapStatisticsService.refresh();
 }
 function clearHistory(){
 
@@ -197,20 +199,26 @@ AdvancedStatisticsService.refresh();
 
 StreakStatisticsService.refresh();
 
+GapStatisticsService.refresh();
+
 }
 
 window.onload = function(){
 
-    refreshHistory();
+refreshHistory();
 
-    StatisticsService.refresh();
+StatisticsService.refresh();
 
-    StatisticsService.refreshDistribution();
+StatisticsService.refreshDistribution();
 
-    AdvancedStatisticsService.refresh();
+AdvancedStatisticsService.refresh();
 
-    StreakStatisticsService.refresh();
+StreakStatisticsService.refresh();
+
+GapStatisticsService.refresh();
 
 };
+
+
 
 
