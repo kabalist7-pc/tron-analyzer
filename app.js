@@ -175,11 +175,9 @@ StatisticsService.refreshDistribution();
 
 AdvancedStatisticsService.refresh();
 
-StreakStatisticsService.refresh();
-
-GapStatisticsService.refresh();
-
 ChiSquareService.refresh();
+
+KolmogorovSmirnovService.refresh();
 }
 function clearHistory(){
 
@@ -189,9 +187,7 @@ function clearHistory(){
         return;
     }
 
-    StorageService.clearHistory();
-
-refreshHistory();
+    refreshHistory();
 
 StatisticsService.refresh();
 
@@ -199,12 +195,9 @@ StatisticsService.refreshDistribution();
 
 AdvancedStatisticsService.refresh();
 
-StreakStatisticsService.refresh();
-
-GapStatisticsService.refresh();
-
 ChiSquareService.refresh();
 
+KolmogorovSmirnovService.refresh();
 }
 
 window.onload = function(){
@@ -217,13 +210,12 @@ window.onload = function(){
 
     AdvancedStatisticsService.refresh();
 
-    StreakStatisticsService.refresh();
-
-    GapStatisticsService.refresh();
-
     ChiSquareService.refresh();
 
+    KolmogorovSmirnovService.refresh();
+
 };
+
 
 
 
