@@ -183,4 +183,11 @@ function clearHistory(){
     refreshHistory();
 
 }
-window.onload = refreshHistory;
+
+window.onload = function(){
+
+    refreshHistory();
+
+    StatisticsService.refresh();
+
+};
