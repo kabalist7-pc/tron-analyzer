@@ -166,11 +166,14 @@ class StatisticsService {
         document.getElementById("statsAvg").textContent =
             this.average().toFixed(2);
 
-        document.getElementById("statsFirst").textContent =
-            this.first().result;
+        const first = this.first();
+const last = this.last();
 
-        document.getElementById("statsLast").textContent =
-            this.last().result;
+document.getElementById("statsFirst").textContent =
+    first ? first.result : "-";
+
+document.getElementById("statsLast").textContent =
+    last ? last.result : "-";
 
     }
 
