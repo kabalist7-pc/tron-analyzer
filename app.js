@@ -30,10 +30,28 @@ function refreshHistory() {
 
     }
 
-    if (history.length === 0) {
+    // Recherche
+    const searchInput =
+        document.getElementById("searchNonce");
+
+    const search =
+        searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : "";
+
+    const filteredHistory = history.filter(item =>
+        item.nonce
+            .toString()
+            .toLowerCase()
+            .includes(search)
+    );
+
+    if (filteredHistory.length === 0) {
 
         container.innerHTML =
-            "Aucune analyse enregistrée.";
+            search === ""
+                ? "Aucune analyse enregistrée."
+                : "Aucun nonce trouvé.";
 
         return;
 
@@ -41,26 +59,23 @@ function refreshHistory() {
 
     let html = "";
 
-    history.forEach((item,index)=>{
+    filteredHistory.forEach(item => {
 
         html += `
         <div class="history-item"
-             onclick="loadHistory(${index})"
-             style="
-                cursor:pointer;
-                border:1px solid #444;
-                padding:10px;
-                margin-bottom:8px;
-                border-radius:8px;
-             ">
+             onclick="loadHistory('${item.nonce}')">
 
-            <b>🎲 ${item.game}</b><br>
+            <div class="history-title">
+                🎲 ${item.game}
+            </div>
 
             Nonce : ${item.nonce}<br>
 
             Résultat : ${item.result}<br>
 
-            <small>${new Date(item.createdAt).toLocaleString()}</small>
+            <div class="history-date">
+                ${new Date(item.createdAt).toLocaleString()}
+            </div>
 
         </div>
         `;
@@ -71,13 +86,15 @@ function refreshHistory() {
 
 }
 
-function loadHistory(index){
+function loadHistory(nonce){
 
     const history =
         StorageService.getHistory();
 
     const item =
-        history[index];
+        history.find(h =>
+            String(h.nonce) === String(nonce)
+        );
 
     if(!item) return;
 
@@ -155,11 +172,9 @@ async function analyse(){
 }
 function clearHistory(){
 
-    const confirmation = confirm(
+    if(!confirm(
         "Voulez-vous vraiment supprimer tout l'historique ?"
-    );
-
-    if(!confirmation){
+    )){
         return;
     }
 
