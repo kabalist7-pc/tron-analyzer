@@ -174,6 +174,8 @@ StatisticsService.refresh();
 StatisticsService.refreshDistribution();
 
 AdvancedStatisticsService.refresh();
+
+StreakStatisticsService.refresh();
 }
 function clearHistory(){
 
@@ -193,6 +195,8 @@ StatisticsService.refreshDistribution();
 
 AdvancedStatisticsService.refresh();
 
+StreakStatisticsService.refresh();
+
 }
 
 window.onload = function(){
@@ -205,5 +209,8 @@ window.onload = function(){
 
     AdvancedStatisticsService.refresh();
 
+    StreakStatisticsService.refresh();
+
 };
+
 
