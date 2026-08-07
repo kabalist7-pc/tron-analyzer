@@ -10,41 +10,87 @@ Fichier : statistics.js
 
 class StatisticsService {
 
-    static refresh() {
+    static history() {
 
-        const history = StorageService.getHistory();
+        return StorageService.getHistory();
 
-        const stats = {
+    }
 
-            analyses: history.length,
+    static total() {
 
-            dice: 0,
+        return this.history().length;
 
-            latestNonce: "-",
+    }
 
-            latestGame: "-",
+    static values() {
 
-            latestDate: "-"
+        return this.history().map(item =>
 
-        };
+            parseFloat(item.result)
 
-        if (history.length > 0) {
+        ).filter(value =>
 
-            stats.latestNonce = history[0].nonce || "-";
+            !isNaN(value)
 
-            stats.latestGame = history[0].game || "-";
+        );
 
-            stats.latestDate = history[0].createdAt || "-";
+    }
 
-            stats.dice = history.filter(
+    static minimum() {
 
-                item => item.game === "Dice"
+        const values = this.values();
 
-            ).length;
+        if(values.length === 0) return null;
 
-        }
+        return Math.min(...values);
 
-        return stats;
+    }
+
+    static maximum() {
+
+        const values = this.values();
+
+        if(values.length === 0) return null;
+
+        return Math.max(...values);
+
+    }
+
+    static average() {
+
+        const values = this.values();
+
+        if(values.length === 0) return null;
+
+        const total = values.reduce(
+
+            (sum,value)=>sum+value,
+
+            0
+
+        );
+
+        return total / values.length;
+
+    }
+
+    static first() {
+
+        const history = this.history();
+
+        if(history.length===0) return null;
+
+        return history[history.length-1];
+
+    }
+
+    static last() {
+
+        const history = this.history();
+
+        if(history.length===0) return null;
+
+        return history[0];
 
     }
 
