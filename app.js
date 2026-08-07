@@ -178,6 +178,8 @@ AdvancedStatisticsService.refresh();
 StreakStatisticsService.refresh();
 
 GapStatisticsService.refresh();
+
+ChiSquareService.refresh();
 }
 function clearHistory(){
 
@@ -201,23 +203,28 @@ StreakStatisticsService.refresh();
 
 GapStatisticsService.refresh();
 
+ChiSquareService.refresh();
+
 }
 
 window.onload = function(){
 
-refreshHistory();
+    refreshHistory();
 
-StatisticsService.refresh();
+    StatisticsService.refresh();
 
-StatisticsService.refreshDistribution();
+    StatisticsService.refreshDistribution();
 
-AdvancedStatisticsService.refresh();
+    AdvancedStatisticsService.refresh();
 
-StreakStatisticsService.refresh();
+    StreakStatisticsService.refresh();
 
-GapStatisticsService.refresh();
+    GapStatisticsService.refresh();
+
+    ChiSquareService.refresh();
 
 };
+
 
 
 
