@@ -267,6 +267,47 @@
         </div>
 
     </section>
+        <!-- ==========================
+         Analyse des écarts
+    =========================== -->
+
+    <section class="card">
+
+        <h2>📏 Analyse des écarts</h2>
+
+        <div class="row">
+            <span>Écart min (&gt; 90)</span>
+            <span id="gapMinAbove90">0</span>
+        </div>
+
+        <div class="row">
+            <span>Écart moyen (&gt; 90)</span>
+            <span id="gapAvgAbove90">0.00</span>
+        </div>
+
+        <div class="row">
+            <span>Écart max (&gt; 90)</span>
+            <span id="gapMaxAbove90">0</span>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <span>Écart min (&lt; 10)</span>
+            <span id="gapMinBelow10">0</span>
+        </div>
+
+        <div class="row">
+            <span>Écart moyen (&lt; 10)</span>
+            <span id="gapAvgBelow10">0.00</span>
+        </div>
+
+        <div class="row">
+            <span>Écart max (&lt; 10)</span>
+            <span id="gapMaxBelow10">0</span>
+        </div>
+
+    </section>
     </main>
 
 <script src="parser.js"></script>
@@ -284,6 +325,8 @@
 <script src="advanced_statistics.js"></script>
     
 <script src="streak_statistics.js"></script>
+
+<script src="gap_statistics.js"></script>
     
 <script src="app.js"></script>
 
