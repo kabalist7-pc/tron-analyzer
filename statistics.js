@@ -13,7 +13,60 @@ class StatisticsService {
     static history() {
 
         return StorageService.getHistory();
+static distribution() {
 
+    const ranges = {
+
+        "0-10": 0,
+        "10-20": 0,
+        "20-30": 0,
+        "30-40": 0,
+        "40-50": 0,
+        "50-60": 0,
+        "60-70": 0,
+        "70-80": 0,
+        "80-90": 0,
+        "90-100": 0
+
+    };
+
+    this.values().forEach(value => {
+
+        if(value < 10)
+            ranges["0-10"]++;
+
+        else if(value < 20)
+            ranges["10-20"]++;
+
+        else if(value < 30)
+            ranges["20-30"]++;
+
+        else if(value < 40)
+            ranges["30-40"]++;
+
+        else if(value < 50)
+            ranges["40-50"]++;
+
+        else if(value < 60)
+            ranges["50-60"]++;
+
+        else if(value < 70)
+            ranges["60-70"]++;
+
+        else if(value < 80)
+            ranges["70-80"]++;
+
+        else if(value < 90)
+            ranges["80-90"]++;
+
+        else
+            ranges["90-100"]++;
+
+    });
+
+    return ranges;
+
+}
     }
 static refresh() {
 
