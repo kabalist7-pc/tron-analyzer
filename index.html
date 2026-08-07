@@ -86,31 +86,37 @@ Prêt.
 <section class="card">
 
 <div class="history-header">
-<input
-    id="searchNonce"
-    type="text"
-    placeholder="🔍 Rechercher un nonce..."
-    oninput="refreshHistory()">
-<h2>Historique</h2>
+<section class="card">
 
-<span id="historyCounter">0 analyse</span>
+    <div class="history-header">
 
-</div>
+        <h2>Historique</h2>
 
-Aucune analyse enregistrée.
+        <span id="historyCounter">0 analyse</span>
 
-</div>
+    </div>
 
-<button
-id="clearHistoryBtn"
-onclick="clearHistory()">
+    <input
+        id="searchNonce"
+        type="text"
+        placeholder="🔍 Rechercher un nonce..."
+        oninput="refreshHistory()">
 
-🗑️ Vider l'historique
+    <div id="history">
 
-</button>
+        Aucune analyse enregistrée.
+
+    </div>
+
+    <button
+        id="clearHistoryBtn"
+        onclick="clearHistory()">
+
+        🗑️ Vider l'historique
+
+    </button>
 
 </section>
-
 </main>
 
 <script src="parser.js"></script>
