@@ -15,7 +15,40 @@ class StatisticsService {
         return StorageService.getHistory();
 
     }
+static refresh() {
 
+    const total = this.total();
+
+    document.getElementById("statsTotal").textContent = total;
+
+    if(total === 0){
+
+        document.getElementById("statsMin").textContent = "-";
+        document.getElementById("statsMax").textContent = "-";
+        document.getElementById("statsAvg").textContent = "-";
+        document.getElementById("statsFirst").textContent = "-";
+        document.getElementById("statsLast").textContent = "-";
+
+        return;
+
+    }
+
+    document.getElementById("statsMin").textContent =
+        this.minimum().toFixed(2);
+
+    document.getElementById("statsMax").textContent =
+        this.maximum().toFixed(2);
+
+    document.getElementById("statsAvg").textContent =
+        this.average().toFixed(2);
+
+    document.getElementById("statsFirst").textContent =
+        this.first().result;
+
+    document.getElementById("statsLast").textContent =
+        this.last().result;
+
+}
     static total() {
 
         return this.history().length;
