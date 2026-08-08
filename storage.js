@@ -81,6 +81,56 @@ class StorageService {
         );
 
     }
+    static importHistory(rows) {
+
+    const history = this.getHistory();
+
+    let imported = 0;
+
+    rows.forEach(data => {
+
+        const exists = history.find(item =>
+            item.game === data.game &&
+            item.nonce === data.nonce
+        );
+
+        if (exists)
+            return;
+
+        history.push({
+
+            game: data.game || "Dice",
+
+            nonce: data.nonce || "",
+
+            result: data.result,
+
+            serverSeed: data.serverSeed || "",
+
+            clientSeed: data.clientSeed || "",
+
+            hash: data.hash || "",
+
+            url: data.url || "",
+
+            createdAt:
+                data.createdAt ||
+                new Date().toISOString()
+
+        });
+
+        imported++;
+
+    });
+
+    localStorage.setItem(
+        this.KEY,
+        JSON.stringify(history)
+    );
+
+    return imported;
+
+    }
 
     static clearHistory() {
 
