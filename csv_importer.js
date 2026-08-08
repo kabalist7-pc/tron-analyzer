@@ -56,5 +56,74 @@ class CSVImporterService {
         return rows;
 
     }
+static normalize(rows) {
 
+    return rows
+        .map(row => {
+
+            const result =
+                parseFloat(
+                    row.result ??
+                    row.Result ??
+                    row.RESULT ??
+                    row.value ??
+                    row.Value
+                );
+
+            if (isNaN(result))
+                return null;
+
+            return {
+
+                nonce:
+                    row.nonce ??
+                    row.Nonce ??
+                    row.NONCE ??
+                    "",
+
+                result: result,
+
+                game:
+                    row.game ??
+                    row.Game ??
+                    row.GAME ??
+                    "Dice",
+
+                createdAt:
+                    row.createdAt ??
+                    row.created_at ??
+                    row.date ??
+                    row.Date ??
+                    new Date().toISOString()
+
+            };
+
+        })
+        .filter(item => item !== null);
+
+}
+    static validate(rows) {
+
+    const valid = [];
+
+    rows.forEach(row => {
+
+        if (!row)
+            return;
+
+        const result = parseFloat(row.result);
+
+        if (isNaN(result))
+            return;
+
+        if (result < 0 || result >= 100)
+            return;
+
+        valid.push(row);
+
+    });
+
+    return valid;
+
+    }
 }
