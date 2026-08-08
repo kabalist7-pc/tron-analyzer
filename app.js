@@ -218,6 +218,32 @@ window.onload = function(){
     KolmogorovSmirnovService.refresh();
 
 };
+const testServerSeed =
+    "c9f10b56c704b0e29a7064a9de277ad4a2057e259db0967815ed4efbfdc0fd12";
+
+const testClientSeed =
+    "Angegardienpc@";
+
+const testNonce =
+    624842;
+
+const testResult =
+    ProvablyFairService.calculate(
+        testServerSeed,
+        testClientSeed,
+        testNonce
+    );
+
+console.log(
+    "Résultat Provably Fair :",
+    testResult
+);
+
+alert(
+    "Test Provably Fair\n\n" +
+    "Nonce : " + testNonce + "\n" +
+    "Résultat calculé : " + testResult
+);
 document.getElementById("csvImportButton")
     .addEventListener("click", function() {
 
