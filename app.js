@@ -218,67 +218,69 @@ window.onload = function(){
     KolmogorovSmirnovService.refresh();
 
     alert("TRON ANALYZER : TEST APP.JS");
-);
-document.getElementById("csvImportButton")
-    .addEventListener("click", function() {
 
-        const input =
-            document.getElementById("csvFileInput");
+    document.getElementById("csvImportButton")
+        .addEventListener("click", function() {
 
-        const status =
-            document.getElementById("csvImportStatus");
+            const input =
+                document.getElementById("csvFileInput");
 
-        if (!input.files.length) {
+            const status =
+                document.getElementById("csvImportStatus");
 
-            status.textContent =
-                "Veuillez sélectionner un fichier CSV.";
+            if (!input.files.length) {
 
-            return;
+                status.textContent =
+                    "Veuillez sélectionner un fichier CSV.";
 
-        }
+                return;
 
-        const file =
-            input.files[0];
+            }
 
-        const reader =
-            new FileReader();
+            const file =
+                input.files[0];
 
-        reader.onload = function(event) {
+            const reader =
+                new FileReader();
 
-            const text =
-                event.target.result;
+            reader.onload = function(event) {
 
-            const imported =
-                CSVImporterService.import(text);
+                const text =
+                    event.target.result;
 
-            status.textContent =
-                imported +
-                " résultat(s) importé(s).";
+                const imported =
+                    CSVImporterService.import(text);
 
-            refreshHistory();
+                status.textContent =
+                    imported +
+                    " résultat(s) importé(s).";
 
-            StatisticsService.refresh();
+                refreshHistory();
 
-            StatisticsService.refreshDistribution();
+                StatisticsService.refresh();
 
-            AdvancedStatisticsService.refresh();
+                StatisticsService.refreshDistribution();
 
-            ChiSquareService.refresh();
+                AdvancedStatisticsService.refresh();
 
-            KolmogorovSmirnovService.refresh();
+                ChiSquareService.refresh();
 
-        };
+                KolmogorovSmirnovService.refresh();
 
-        reader.onerror = function() {
+            };
 
-            status.textContent =
-                "Erreur lors de la lecture du fichier.";
+            reader.onerror = function() {
 
-        };
+                status.textContent =
+                    "Erreur lors de la lecture du fichier.";
 
-        reader.readAsText(file);
+            };
 
-    });
+            reader.readAsText(file);
+
+        });
+
+};
 
 
 
