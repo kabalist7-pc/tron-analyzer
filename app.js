@@ -218,6 +218,66 @@ window.onload = function(){
     KolmogorovSmirnovService.refresh();
 
 };
+document.getElementById("csvImportButton")
+    .addEventListener("click", function() {
+
+        const input =
+            document.getElementById("csvFileInput");
+
+        const status =
+            document.getElementById("csvImportStatus");
+
+        if (!input.files.length) {
+
+            status.textContent =
+                "Veuillez sélectionner un fichier CSV.";
+
+            return;
+
+        }
+
+        const file =
+            input.files[0];
+
+        const reader =
+            new FileReader();
+
+        reader.onload = function(event) {
+
+            const text =
+                event.target.result;
+
+            const imported =
+                CSVImporterService.import(text);
+
+            status.textContent =
+                imported +
+                " résultat(s) importé(s).";
+
+            refreshHistory();
+
+            StatisticsService.refresh();
+
+            StatisticsService.refreshDistribution();
+
+            AdvancedStatisticsService.refresh();
+
+            ChiSquareService.refresh();
+
+            KolmogorovSmirnovService.refresh();
+
+        };
+
+        reader.onerror = function() {
+
+            status.textContent =
+                "Erreur lors de la lecture du fichier.";
+
+        };
+
+        reader.readAsText(file);
+
+    });
 
 
 
