@@ -126,4 +126,21 @@ static normalize(rows) {
     return valid;
 
     }
+    static import(text) {
+
+    const rows =
+        this.parse(text);
+
+    const normalized =
+        this.normalize(rows);
+
+    const valid =
+        this.validate(normalized);
+
+    if (valid.length === 0)
+        return 0;
+
+    return StorageService.importHistory(valid);
+
+    }
 }
