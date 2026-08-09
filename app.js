@@ -220,34 +220,94 @@ window.onload = function(){
     const simulation =
     DiceSimulatorService.generate(10);
 
-const firstResult =
-    simulation.results[0];
+const simulation =
+    DiceSimulatorService.generate(1000);
 
-const verification =
-    ProvablyFairService.verify(
-        firstResult.serverSeed,
-        firstResult.clientSeed,
-        firstResult.nonce,
-        firstResult.result
+const results =
+    simulation.results.map(item =>
+        item.result
     );
 
-alert(
-    "TEST VERIFICATION SIMULATION\n\n" +
+const total =
+    results.length;
 
-    "Nonce : " +
-    firstResult.nonce +
+const sum =
+    results.reduce(
+        (acc, value) => acc + value,
+        0
+    );
 
-    "\nRésultat simulé : " +
-    firstResult.result.toFixed(2) +
+const average =
+    sum / total;
 
-    "\nRésultat recalculé : " +
-    verification.calculatedResult +
+const minimum =
+    Math.min(...results);
 
-    "\n\nStatut : " +
-    (verification.valid
-        ? "✅ VALIDÉ"
-        : "❌ ÉCHEC")
-);
+const maximum =
+    Math.max(...results);
+
+let bins = [
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0
+];
+
+results.forEach(value => {
+
+    let index =
+        Math.floor(value / 10);
+
+    if (index >= 10)
+        index = 9;
+
+    bins[index]++;
+
+});
+
+let message =
+    "TEST 1000 SIMULATIONS\n\n" +
+
+    "Source : " +
+    simulation.source +
+
+    "\nJeu : " +
+    simulation.game +
+
+    "\nNombre : " +
+    total +
+
+    "\n\nMoyenne : " +
+    average.toFixed(2) +
+
+    "\nMinimum : " +
+    minimum.toFixed(2) +
+
+    "\nMaximum : " +
+    maximum.toFixed(2) +
+
+    "\n\nDistribution :\n";
+
+bins.forEach((count, index) => {
+
+    const start =
+        index * 10;
+
+    const end =
+        start + 10;
+
+    message +=
+        start +
+        "–" +
+        end +
+        " : " +
+        count +
+        "\n";
+
+});
+
+alert(message);
+    
+
+    
 
     document.getElementById("csvImportButton")
         .addEventListener("click", function() {
