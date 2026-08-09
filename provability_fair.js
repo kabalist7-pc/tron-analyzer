@@ -59,5 +59,43 @@ class ProvablyFairService {
         return (number / 100).toFixed(2);
 
     }
+    static verify(
+    serverSeed,
+    clientSeed,
+    nonce,
+    expectedResult
+) {
+
+    const calculatedResult =
+        this.calculate(
+            serverSeed,
+            clientSeed,
+            nonce
+        );
+
+    const calculated =
+        parseFloat(calculatedResult);
+
+    const expected =
+        parseFloat(expectedResult);
+
+    const valid =
+        !isNaN(calculated) &&
+        !isNaN(expected) &&
+        calculated === expected;
+
+    return {
+
+        valid: valid,
+
+        calculatedResult:
+            calculatedResult,
+
+        expectedResult:
+            expectedResult
+
+    };
+
+    }
 
 }
