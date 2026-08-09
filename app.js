@@ -218,9 +218,6 @@ window.onload = function(){
     KolmogorovSmirnovService.refresh();
 
     const simulation =
-    DiceSimulatorService.generate(10);
-
-const simulation =
     DiceSimulatorService.generate(1000);
 
 const results =
