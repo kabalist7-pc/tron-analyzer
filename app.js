@@ -217,18 +217,13 @@ window.onload = function(){
 
     KolmogorovSmirnovService.refresh();
 
-    const testResult =
-    ProvablyFairService.calculate(
-        "c9f10b56c704b0e29a7064a9de277ad4a2057e259db0967815ed4efbfdc0fd12",
-        "Angegardienpc@",
-        624842
-    );
-
-alert(
-    "TEST PROVABLY FAIR\n\n" +
-    "Nonce : 624842\n" +
-    "Résultat calculé : " +
-    testResult
+    alert(
+    "TEST 1\n\n" +
+    "ProvablyFairService : " +
+    (typeof ProvablyFairService) +
+    "\n\n" +
+    "CryptoJS : " +
+    (typeof CryptoJS)
 );
 
     document.getElementById("csvImportButton")
