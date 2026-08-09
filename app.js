@@ -217,19 +217,27 @@ window.onload = function(){
 
     KolmogorovSmirnovService.refresh();
 
-    const testResult =
-    ProvablyFairService.calculate(
-        "c9f10b56c704b0e29a7064a9de277ad4a2057e259db0967815ed4efbfdc0fd12",
-        "Angegardienpc@",
-        624842
-    );
+    const simulation =
+    DiceSimulatorService.generate(10);
 
-alert(
-    "TEST PROVABLY FAIR\n\n" +
-    "Nonce : 624842\n" +
-    "Résultat calculé : " +
-    testResult
-);
+let message =
+    "TEST SIMULATION\n\n" +
+    "Source : " + simulation.source + "\n" +
+    "Jeu : " + simulation.game + "\n" +
+    "Server Seed : " + simulation.serverSeed + "\n" +
+    "Client Seed : " + simulation.clientSeed + "\n" +
+    "Nombre : " + simulation.count + "\n\n";
+
+simulation.results.forEach(item => {
+
+    message +=
+        "Nonce " + item.nonce +
+        " → " + item.result.toFixed(2) +
+        "\n";
+
+});
+
+alert(message);
 
     document.getElementById("csvImportButton")
         .addEventListener("click", function() {
