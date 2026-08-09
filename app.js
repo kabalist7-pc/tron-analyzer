@@ -217,10 +217,15 @@ window.onload = function(){
 
     KolmogorovSmirnovService.refresh();
 
-    alert("DÉBUT TEST 1000");
-
     const simulation =
-        DiceSimulatorService.generate(1000);
+    DiceSimulatorService.generate(1000);
+
+alert(
+    "TEST 1000\n\n" +
+    "Source : " + simulation.source + "\n" +
+    "Jeu : " + simulation.game + "\n" +
+    "Nombre : " + simulation.count
+);
 
 };
 
