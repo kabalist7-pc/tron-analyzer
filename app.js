@@ -220,24 +220,34 @@ window.onload = function(){
     const simulation =
     DiceSimulatorService.generate(10);
 
-let message =
-    "TEST SIMULATION\n\n" +
-    "Source : " + simulation.source + "\n" +
-    "Jeu : " + simulation.game + "\n" +
-    "Server Seed : " + simulation.serverSeed + "\n" +
-    "Client Seed : " + simulation.clientSeed + "\n" +
-    "Nombre : " + simulation.count + "\n\n";
+const firstResult =
+    simulation.results[0];
 
-simulation.results.forEach(item => {
+const verification =
+    ProvablyFairService.verify(
+        firstResult.serverSeed,
+        firstResult.clientSeed,
+        firstResult.nonce,
+        firstResult.result
+    );
 
-    message +=
-        "Nonce " + item.nonce +
-        " → " + item.result.toFixed(2) +
-        "\n";
+alert(
+    "TEST VERIFICATION SIMULATION\n\n" +
 
-});
+    "Nonce : " +
+    firstResult.nonce +
 
-alert(message);
+    "\nRésultat simulé : " +
+    firstResult.result.toFixed(2) +
+
+    "\nRésultat recalculé : " +
+    verification.calculatedResult +
+
+    "\n\nStatut : " +
+    (verification.valid
+        ? "✅ VALIDÉ"
+        : "❌ ÉCHEC")
+);
 
     document.getElementById("csvImportButton")
         .addEventListener("click", function() {
