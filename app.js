@@ -202,6 +202,178 @@ function clearHistory(){
     KolmogorovSmirnovService.refresh();
 
 }
+function logGamma(z) {
+
+    const coefficients = [
+        676.5203681218851,
+        -1259.1392167224028,
+        771.32342877765313,
+        -176.61502916214059,
+        12.507343278686905,
+        -0.13857109526572012,
+        9.984369578019572e-6,
+        1.5056327351493116e-7
+    ];
+
+    if (z < 0.5) {
+
+        return Math.log(Math.PI) -
+            Math.log(Math.sin(Math.PI * z)) -
+            logGamma(1 - z);
+
+    }
+
+    z -= 1;
+
+    let x = 0.99999999999980993;
+
+    for (let i = 0; i < coefficients.length; i++) {
+
+        x +=
+            coefficients[i] /
+            (z + i + 1);
+
+    }
+
+    const t =
+        z + coefficients.length - 0.5;
+
+    return (
+        0.5 * Math.log(2 * Math.PI) +
+        (z + 0.5) * Math.log(t) -
+        t +
+        Math.log(x)
+    );
+
+}
+
+
+function gammaQ(a, x) {
+
+    if (x < 0 || a <= 0)
+        return NaN;
+
+    if (x === 0)
+        return 1;
+
+    const EPS = 1e-14;
+    const FPMIN = 1e-300;
+    const MAX_ITER = 1000;
+
+    if (x < a + 1) {
+
+        let sum = 1 / a;
+        let term = sum;
+        let n = 1;
+
+        while (n <= MAX_ITER) {
+
+            term *=
+                x / (a + n);
+
+            sum += term;
+
+            if (
+                Math.abs(term) <
+                Math.abs(sum) * EPS
+            )
+                break;
+
+            n++;
+
+        }
+
+        const logTerm =
+            -x +
+            a * Math.log(x) -
+            logGamma(a);
+
+        const p =
+            sum * Math.exp(logTerm);
+
+        return 1 - p;
+
+    }
+
+    let b =
+        x + 1 - a;
+
+    let c =
+        1 / FPMIN;
+
+    let d =
+        1 / b;
+
+    let h =
+        d;
+
+    for (
+        let i = 1;
+        i <= MAX_ITER;
+        i++
+    ) {
+
+        const an =
+            -i * (i - a);
+
+        b += 2;
+
+        d =
+            an * d + b;
+
+        if (Math.abs(d) < FPMIN)
+            d = FPMIN;
+
+        c =
+            b + an / c;
+
+        if (Math.abs(c) < FPMIN)
+            c = FPMIN;
+
+        d =
+            1 / d;
+
+        const delta =
+            d * c;
+
+        h *= delta;
+
+        if (
+            Math.abs(delta - 1) <
+            EPS
+        )
+            break;
+
+    }
+
+    const logTerm =
+        -x +
+        a * Math.log(x) -
+        logGamma(a);
+
+    return Math.exp(logTerm) * h;
+
+}
+
+
+function chiSquareCDF(
+    chiSquare,
+    degreesOfFreedom
+) {
+
+    if (
+        chiSquare < 0 ||
+        degreesOfFreedom <= 0
+    )
+        return NaN;
+
+    return 1 -
+        gammaQ(
+            degreesOfFreedom / 2,
+            chiSquare / 2
+        );
+
+}
 
 window.onload = function(){
 
@@ -262,6 +434,35 @@ window.onload = function(){
 
     });
 
+        const expected =
+        total / 10;
+
+    let chiSquare = 0;
+
+    bins.forEach(observed => {
+
+        chiSquare +=
+            Math.pow(
+                observed - expected,
+                2
+            ) / expected;
+
+    });
+
+    const degreesOfFreedom = 9;
+
+    const pValue =
+        1 -
+        chiSquareCDF(
+            chiSquare,
+            degreesOfFreedom
+        );
+
+    const diagnosis =
+        pValue >= 0.05
+            ? "✅ Distribution compatible avec l'uniformité"
+            : "⚠️ Écart statistique détecté";
+
     let message =
         "ANALYSE SIMULATION\n\n" +
 
@@ -306,6 +507,24 @@ window.onload = function(){
 
         }
     );
+
+        message +=
+        "\nTEST DU CHI CARRÉ\n" +
+
+        "Effectif théorique : " +
+        expected.toFixed(2) +
+
+        "\nχ² : " +
+        chiSquare.toFixed(4) +
+
+        "\nddl : " +
+        degreesOfFreedom +
+
+        "\np-value : " +
+        pValue.toFixed(6) +
+
+        "\n\n" +
+        diagnosis;
 
     alert(message);
 
