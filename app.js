@@ -458,6 +458,13 @@ window.onload = function(){
             degreesOfFreedom
         );
 
+    alert(
+    "DEBUG CHI CARRÉ\n\n" +
+    "χ² = " + chiSquare + "\n" +
+    "ddl = " + degreesOfFreedom + "\n" +
+    "p-value = " + pValue
+);
+
     const diagnosis =
         pValue >= 0.05
             ? "✅ Distribution compatible avec l'uniformité"
