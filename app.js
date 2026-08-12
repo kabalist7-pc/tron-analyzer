@@ -547,7 +547,7 @@ catch (error) {
 
 }
 
-    try {
+        try {
 
         const seedRecords = [
 
@@ -618,24 +618,19 @@ catch (error) {
                 seedRecords
             );
 
-        alert(
-            SeedLabService.createReport(
-                seedAnalysis
-            )
+        SeedLabService.render(
+            seedAnalysis
         );
 
     }
     catch (error) {
 
-        alert(
-            "ERREUR SEED LAB\n\n" +
-            error.name +
-            "\n\n" +
-            error.message
+        console.error(
+            "SEED LAB ERROR:",
+            error
         );
 
     }
-
 };
 
 
