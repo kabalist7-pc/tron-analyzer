@@ -1,8 +1,9 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 2.0
+Version : 2.1
 Fichier : storage.js
+Compatible Seed Lab V3
 =====================================================
 */
 
@@ -12,21 +13,77 @@ class StorageService {
 
     static KEY = "tron_analyzer_history_v2";
 
+
+    /*
+    =================================================
+    RÉCUPÉRER L'HISTORIQUE
+    =================================================
+    */
+
     static getHistory() {
 
         try {
 
-            const raw = localStorage.getItem(this.KEY);
+            const raw =
+                localStorage.getItem(
+                    this.KEY
+                );
 
-            if (!raw) return [];
+            if (!raw)
+                return [];
 
-            return JSON.parse(raw);
+
+            const history =
+                JSON.parse(raw);
+
+
+            if (!Array.isArray(history))
+                return [];
+
+
+            /*
+            Compatibilité avec les anciennes analyses.
+
+            Ancien format :
+                hash
+
+            Nouveau format :
+                serverSeedHash
+            */
+
+            return history.map(item => ({
+
+                ...item,
+
+                serverSeed:
+                    item.serverSeed || "",
+
+                serverSeedHash:
+                    item.serverSeedHash ||
+                    item.hash ||
+                    "",
+
+                hash:
+                    item.hash ||
+                    item.serverSeedHash ||
+                    "",
+
+                clientSeed:
+                    item.clientSeed || "",
+
+                url:
+                    item.url || ""
+
+            }));
 
         }
 
         catch (e) {
 
-            console.error(e);
+            console.error(
+                "Erreur lecture historique :",
+                e
+            );
 
             return [];
 
@@ -34,43 +91,81 @@ class StorageService {
 
     }
 
+
+    /*
+    =================================================
+    SAUVEGARDER UNE ANALYSE
+    =================================================
+    */
+
     static saveAnalysis(data) {
 
-        const history = this.getHistory();
+        const history =
+            this.getHistory();
 
-        // Évite les doublons (jeu + nonce)
-        const exists = history.find(item =>
 
-            item.game === data.game &&
-            item.nonce === data.nonce
+        /*
+        Évite les doublons
+        */
 
-        );
+        const exists =
+            history.find(item =>
 
-        if (exists) return;
+                item.game === data.game &&
+                String(item.nonce) ===
+                String(data.nonce)
+
+            );
+
+
+        if (exists)
+            return;
+
+
+        const serverSeedHash =
+            data.serverSeedHash ||
+            data.hash ||
+            "";
+
 
         history.unshift({
 
-            game: data.game || "-",
+            game:
+                data.game || "-",
 
-            nonce: data.nonce || "-",
+            nonce:
+                data.nonce || "-",
 
-            result: data.result || "-",
+            result:
+                data.result ?? "-",
 
-            serverSeed: data.serverSeed || "",
+            serverSeed:
+                data.serverSeed || "",
 
-            clientSeed: data.clientSeed || "",
+            serverSeedHash:
+                serverSeedHash,
 
-            hash: data.hash || "",
+            clientSeed:
+                data.clientSeed || "",
 
-            url: data.url || "",
+            /*
+            On conserve également
+            l'ancien champ hash
+            pour compatibilité.
+            */
+
+            hash:
+                serverSeedHash,
+
+            url:
+                data.url || "",
 
             createdAt:
-
                 data.createdAt ||
-
                 new Date().toISOString()
 
         });
+
 
         localStorage.setItem(
 
@@ -81,67 +176,123 @@ class StorageService {
         );
 
     }
+
+
+    /*
+    =================================================
+    IMPORT CSV
+    =================================================
+    */
+
     static importHistory(rows) {
 
-    const history = this.getHistory();
+        const history =
+            this.getHistory();
 
-    let imported = 0;
+        let imported = 0;
 
-    rows.forEach(data => {
 
-        const exists = history.find(item =>
-            item.game === data.game &&
-            item.nonce === data.nonce
-        );
+        rows.forEach(data => {
 
-        if (exists)
-            return;
+            const exists =
+                history.find(item =>
 
-        history.push({
+                    item.game === data.game &&
+                    String(item.nonce) ===
+                    String(data.nonce)
 
-            game: data.game || "Dice",
+                );
 
-            nonce: data.nonce || "",
 
-            result: data.result,
+            if (exists)
+                return;
 
-            serverSeed: data.serverSeed || "",
 
-            clientSeed: data.clientSeed || "",
+            const serverSeedHash =
+                data.serverSeedHash ||
+                data.hash ||
+                "";
 
-            hash: data.hash || "",
 
-            url: data.url || "",
+            history.push({
 
-            createdAt:
-                data.createdAt ||
-                new Date().toISOString()
+                game:
+                    data.game || "Dice",
+
+                nonce:
+                    data.nonce || "",
+
+                result:
+                    data.result ?? "",
+
+                serverSeed:
+                    data.serverSeed || "",
+
+                serverSeedHash:
+                    serverSeedHash,
+
+                clientSeed:
+                    data.clientSeed || "",
+
+                hash:
+                    serverSeedHash,
+
+                url:
+                    data.url || "",
+
+                createdAt:
+                    data.createdAt ||
+                    new Date().toISOString()
+
+            });
+
+
+            imported++;
 
         });
 
-        imported++;
 
-    });
+        localStorage.setItem(
 
-    localStorage.setItem(
-        this.KEY,
-        JSON.stringify(history)
-    );
+            this.KEY,
 
-    return imported;
+            JSON.stringify(history)
+
+        );
+
+
+        return imported;
 
     }
+
+
+    /*
+    =================================================
+    VIDER L'HISTORIQUE
+    =================================================
+    */
 
     static clearHistory() {
 
-        localStorage.removeItem(this.KEY);
+        localStorage.removeItem(
+            this.KEY
+        );
 
     }
+
+
+    /*
+    =================================================
+    TOTAL
+    =================================================
+    */
 
     static total() {
 
-        return this.getHistory().length;
+        return this
+            .getHistory()
+            .length;
 
     }
 
-}
+        }
