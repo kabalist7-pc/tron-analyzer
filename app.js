@@ -547,6 +547,95 @@ catch (error) {
 
 }
 
+    try {
+
+        const seedRecords = [
+
+            {
+                nonce: 636631,
+
+                serverSeed:
+                    "a635c05870f0cb287709980294656370fe65efa5bf7b7da3e77c79fd7a253b6d",
+
+                serverSeedHash:
+                    "5c04b43b5fbb905f5d58c18f709b17ec6a2610a655bec3a9995f16a4e0e29af2",
+
+                clientSeed:
+                    "Angegardienpc@",
+
+                result: 10.98
+            },
+
+            {
+                nonce: 636632,
+
+                serverSeed:
+                    "dc44c7204a378fcb806e2e83dbf788840b26bcf0604d5cd78bdfc16b5980d2e8",
+
+                serverSeedHash:
+                    "5ceefa2c5f41f021ee9e628770eb16009ca38354a189f4b652873e36da65012c",
+
+                clientSeed:
+                    "Angegardienpc@",
+
+                result: 12.00
+            },
+
+            {
+                nonce: 636633,
+
+                serverSeed:
+                    "f60f4327a10e139130ca7c1eb7fd0a1a9d497999d212095856db5d99946cc4ff",
+
+                serverSeedHash:
+                    "d88536f37f97d64d3f30fc04ec0f032d0a5c741a5729fd69afaf8e690416cba1",
+
+                clientSeed:
+                    "Angegardienpc@",
+
+                result: 54.29
+            },
+
+            {
+                nonce: 636634,
+
+                serverSeed:
+                    "6de450a4b16f45fb923f76769cb31c3626473103f60b1e178a270bf73f5a378b",
+
+                serverSeedHash:
+                    "f94282a7f444ecd229c4235ef2fe67e1d86d82f6d6279f23d27ba40a52aaf228",
+
+                clientSeed:
+                    "Angegardienpc@",
+
+                result: 71.23
+            }
+
+        ];
+
+        const seedAnalysis =
+            SeedLabService.analyzeSeries(
+                seedRecords
+            );
+
+        alert(
+            SeedLabService.createReport(
+                seedAnalysis
+            )
+        );
+
+    }
+    catch (error) {
+
+        alert(
+            "ERREUR SEED LAB\n\n" +
+            error.name +
+            "\n\n" +
+            error.message
+        );
+
+    }
+
 };
 
 
