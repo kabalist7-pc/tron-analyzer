@@ -546,93 +546,80 @@ catch (error) {
     );
 
 }
+    /*
+    =================================================
+    SEED LAB
+    Analyse automatique des seeds présents
+    dans l'historique de Tron Analyzer
+    =================================================
+    */
 
-        try {
+    try {
 
-        const seedRecords = [
+        const history =
+            StorageService.getHistory();
 
-            {
-                nonce: 636631,
 
-                serverSeed:
-                    "a635c05870f0cb287709980294656370fe65efa5bf7b7da3e77c79fd7a253b6d",
+        if (
+            Array.isArray(history) &&
+            history.length >= 2
+        ) {
 
-                serverSeedHash:
-                    "5c04b43b5fbb905f5d58c18f709b17ec6a2610a655bec3a9995f16a4e0e29af2",
+            const seedRecords =
+                history
+                    .filter(item =>
+                        item.serverSeed &&
+                        item.serverSeedHash
+                    )
+                    .map(item => ({
 
-                clientSeed:
-                    "Angegardienpc@",
+                        nonce:
+                            Number(item.nonce),
 
-                result: 10.98
-            },
+                        serverSeed:
+                            item.serverSeed,
 
-            {
-                nonce: 636632,
+                        serverSeedHash:
+                            item.serverSeedHash,
 
-                serverSeed:
-                    "dc44c7204a378fcb806e2e83dbf788840b26bcf0604d5cd78bdfc16b5980d2e8",
+                        clientSeed:
+                            item.clientSeed || "",
 
-                serverSeedHash:
-                    "5ceefa2c5f41f021ee9e628770eb16009ca38354a189f4b652873e36da65012c",
+                        result:
+                            Number(item.result)
 
-                clientSeed:
-                    "Angegardienpc@",
+                    }))
+                    .sort(
+                        (a, b) =>
+                            a.nonce - b.nonce
+                    );
 
-                result: 12.00
-            },
 
-            {
-                nonce: 636633,
+            if (seedRecords.length >= 2) {
 
-                serverSeed:
-                    "f60f4327a10e139130ca7c1eb7fd0a1a9d497999d212095856db5d99946cc4ff",
+                const seedAnalysis =
+                    SeedLabService.analyzeSeries(
+                        seedRecords
+                    );
 
-                serverSeedHash:
-                    "d88536f37f97d64d3f30fc04ec0f032d0a5c741a5729fd69afaf8e690416cba1",
 
-                clientSeed:
-                    "Angegardienpc@",
+                SeedLabService.render(
+                    seedAnalysis
+                );
 
-                result: 54.29
-            },
-
-            {
-                nonce: 636634,
-
-                serverSeed:
-                    "6de450a4b16f45fb923f76769cb31c3626473103f60b1e178a270bf73f5a378b",
-
-                serverSeedHash:
-                    "f94282a7f444ecd229c4235ef2fe67e1d86d82f6d6279f23d27ba40a52aaf228",
-
-                clientSeed:
-                    "Angegardienpc@",
-
-                result: 71.23
             }
 
-        ];
-
-        const seedAnalysis =
-            SeedLabService.analyzeSeries(
-                seedRecords
-            );
-
-        SeedLabService.render(
-            seedAnalysis
-        );
+        }
 
     }
     catch (error) {
 
         console.error(
-            "SEED LAB ERROR:",
+            "Erreur Seed Lab :",
             error
         );
 
     }
+    
 };
-
-
-
-
+    
