@@ -1,120 +1,55 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 5.0
-Fichier : seed_lab.js
+Seed Lab V2
+Analyse des relations entre Server Seeds
 =====================================================
 */
 
 "use strict";
 
-class SeedLabService {
+const SeedLabService = {
 
-    /*
-    -------------------------------------------------
-    Normalisation
-    -------------------------------------------------
-    */
+    sha256(value) {
 
-    static normalizeSeed(seed) {
+        if (
+            typeof CryptoJS === "undefined" ||
+            !CryptoJS.SHA256
+        ) {
+            throw new Error(
+                "CryptoJS n'est pas disponible."
+            );
+        }
 
-        if (seed === undefined || seed === null)
-            return "";
+        return CryptoJS
+            .SHA256(value)
+            .toString(CryptoJS.enc.Hex);
+    },
 
-        return String(seed)
+
+    normalizeSeed(seed) {
+
+        return String(seed || "")
             .trim()
             .toLowerCase();
 
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Vérification du format
-    -------------------------------------------------
-    */
-
-    static isValidSeed(seed) {
-
-        const normalized =
-            this.normalizeSeed(seed);
-
-        return /^[0-9a-f]{64}$/.test(
-            normalized
-        );
-
-    }
-
-
-    /*
-    -------------------------------------------------
-    SHA-256 du server seed
-    -------------------------------------------------
-    */
-
-    static sha256(seed) {
-
-        const normalized =
-            this.normalizeSeed(seed);
-
-        return CryptoJS.SHA256(
-            normalized
-        ).toString(
-            CryptoJS.enc.Hex
-        );
-
-    }
-
-
-    /*
-    -------------------------------------------------
-    Vérification seed / hash
-    -------------------------------------------------
-    */
-
-    static verifyHash(
-        serverSeed,
-        expectedHash
-    ) {
+    validateHash(seed, expectedHash) {
 
         const calculated =
-            this.sha256(serverSeed);
+            this.sha256(seed);
 
-        const expected =
-            this.normalizeSeed(
-                expectedHash
-            );
+        return (
+            calculated ===
+            this.normalizeSeed(expectedHash)
+        );
 
-        return {
-
-            valid:
-                calculated === expected,
-
-            calculatedHash:
-                calculated,
-
-            expectedHash:
-                expected
-
-        };
-
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Distance de Hamming
-    -------------------------------------------------
-
-    Nombre de positions différentes
-    entre deux seeds hexadécimaux.
-    -------------------------------------------------
-    */
-
-    static hammingDistance(
-        seedA,
-        seedB
-    ) {
+    hammingDistanceHex(seedA, seedB) {
 
         const a =
             this.normalizeSeed(seedA);
@@ -123,42 +58,31 @@ class SeedLabService {
             this.normalizeSeed(seedB);
 
         if (
-            !this.isValidSeed(a) ||
-            !this.isValidSeed(b)
+            a.length !== 64 ||
+            b.length !== 64
         ) {
             return null;
         }
 
         let distance = 0;
 
-        for (
-            let i = 0;
-            i < a.length;
-            i++
-        ) {
+        for (let i = 0; i < 64; i++) {
 
-            const byteA =
-                parseInt(
-                    a[i],
-                    16
-                );
+            const x =
+                parseInt(a[i], 16);
 
-            const byteB =
-                parseInt(
-                    b[i],
-                    16
-                );
+            const y =
+                parseInt(b[i], 16);
 
             let xor =
-                byteA ^ byteB;
+                x ^ y;
 
-            while (xor !== 0) {
+            while (xor) {
 
                 distance +=
                     xor & 1;
 
-                xor >>=
-                    1;
+                xor >>= 1;
 
             }
 
@@ -166,19 +90,10 @@ class SeedLabService {
 
         return distance;
 
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Distance hexadécimale
-    -------------------------------------------------
-    */
-
-    static hexDifference(
-        seedA,
-        seedB
-    ) {
+    hexDifference(seedA, seedB) {
 
         const a =
             this.normalizeSeed(seedA);
@@ -187,320 +102,237 @@ class SeedLabService {
             this.normalizeSeed(seedB);
 
         if (
-            !this.isValidSeed(a) ||
-            !this.isValidSeed(b)
+            a.length !== 64 ||
+            b.length !== 64
         ) {
             return null;
         }
 
-        let differentCharacters = 0;
+        let different = 0;
 
-        for (
-            let i = 0;
-            i < a.length;
-            i++
-        ) {
+        for (let i = 0; i < 64; i++) {
 
             if (a[i] !== b[i])
-                differentCharacters++;
+                different++;
 
         }
 
-        return differentCharacters;
+        return different;
 
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Test relation SHA-256
-    -------------------------------------------------
-    */
-
-    static testShaChain(
-        seedA,
-        seedB
+    testSHA256Relation(
+        previous,
+        next
     ) {
 
-        const calculated =
-            this.sha256(seedA);
+        return (
+            this.sha256(previous) ===
+            this.normalizeSeed(next)
+        );
 
-        return {
-
-            matches:
-                calculated ===
-                this.normalizeSeed(seedB),
-
-            calculated:
-                calculated,
-
-            target:
-                this.normalizeSeed(seedB)
-
-        };
-
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Test relation SHA256(SHA256(seed))
-    -------------------------------------------------
-    */
-
-    static testDoubleSha(
-        seedA,
-        seedB
+    testDoubleSHA256Relation(
+        previous,
+        next
     ) {
 
         const first =
-            this.sha256(seedA);
+            this.sha256(previous);
 
         const second =
             this.sha256(first);
 
-        return {
+        return (
+            second ===
+            this.normalizeSeed(next)
+        );
 
-            matches:
-                second ===
-                this.normalizeSeed(seedB),
-
-            calculated:
-                second,
-
-            target:
-                this.normalizeSeed(seedB)
-
-        };
-
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Test relation HMAC
-    -------------------------------------------------
-    */
-
-    static testHmac(
-        seedA,
-        seedB,
-        message
+    testHMACRelation(
+        previous,
+        nonce,
+        next
     ) {
 
-        const a =
-            this.normalizeSeed(seedA);
-
-        const b =
-            this.normalizeSeed(seedB);
-
-        const msg =
-            String(message);
+        if (
+            typeof CryptoJS === "undefined" ||
+            !CryptoJS.HmacSHA256
+        ) {
+            return false;
+        }
 
         const calculated =
-            CryptoJS.HmacSHA256(
-                msg,
-                a
-            ).toString(
-                CryptoJS.enc.Hex
-            );
+            CryptoJS
+                .HmacSHA256(
+                    String(nonce),
+                    previous
+                )
+                .toString(
+                    CryptoJS.enc.Hex
+                );
 
-        return {
+        return (
+            calculated ===
+            this.normalizeSeed(next)
+        );
 
-            matches:
-                calculated === b,
-
-            calculated:
-                calculated,
-
-            target:
-                b
-
-        };
-
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Analyse de deux seeds consécutifs
-    -------------------------------------------------
-    */
-
-    static compareSeeds(
+    analyzeTransition(
         previous,
-        current
+        next
     ) {
 
-        const previousSeed =
-            this.normalizeSeed(
-                previous.serverSeed
-            );
-
-        const currentSeed =
-            this.normalizeSeed(
-                current.serverSeed
-            );
-
-        const hashCheck =
-            this.verifyHash(
-                currentSeed,
-                current.serverSeedHash
-            );
-
         const hamming =
-            this.hammingDistance(
-                previousSeed,
-                currentSeed
+            this.hammingDistanceHex(
+                previous.serverSeed,
+                next.serverSeed
             );
 
-        const hexDiff =
+        const hexDifference =
             this.hexDifference(
-                previousSeed,
-                currentSeed
-            );
-
-        const shaChain =
-            this.testShaChain(
-                previousSeed,
-                currentSeed
-            );
-
-        const doubleSha =
-            this.testDoubleSha(
-                previousSeed,
-                currentSeed
-            );
-
-        const nonceMessage =
-            String(
-                previous.nonce
-            );
-
-        const hmac =
-            this.testHmac(
-                previousSeed,
-                currentSeed,
-                nonceMessage
+                previous.serverSeed,
+                next.serverSeed
             );
 
         return {
 
-            previousNonce:
+            fromNonce:
                 previous.nonce,
 
-            currentNonce:
-                current.nonce,
+            toNonce:
+                next.nonce,
 
-            previousSeed:
-                previousSeed,
+            hamming,
 
-            currentSeed:
-                currentSeed,
+            hexDifference,
 
-            hashValid:
-                hashCheck.valid,
+            sha256:
+                this.testSHA256Relation(
+                    previous.serverSeed,
+                    next.serverSeed
+                ),
 
-            calculatedHash:
-                hashCheck.calculatedHash,
+            doubleSHA256:
+                this.testDoubleSHA256Relation(
+                    previous.serverSeed,
+                    next.serverSeed
+                ),
 
-            expectedHash:
-                hashCheck.expectedHash,
-
-            hammingDistance:
-                hamming,
-
-            hexDifference:
-                hexDiff,
-
-            shaChain:
-                shaChain,
-
-            doubleSha:
-                doubleSha,
-
-            hmacNonce:
-                hmac
+            hmac:
+                this.testHMACRelation(
+                    previous.serverSeed,
+                    next.nonce,
+                    next.serverSeed
+                )
 
         };
 
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Analyse d'une série complète
-    -------------------------------------------------
-    */
-
-    static analyzeSeries(records) {
+    analyzeSeries(records) {
 
         if (
             !Array.isArray(records) ||
-            records.length < 2
+            records.length === 0
         ) {
 
             return {
 
-                success: false,
-
-                error:
-                    "Au moins deux seeds sont nécessaires."
+                total: 0,
+                validHashes: 0,
+                invalidHashes: 0,
+                averageHamming: 0,
+                transitions: []
 
             };
 
         }
 
-        const comparisons = [];
+        const normalized =
+            records.map(record => ({
+
+                ...record,
+
+                nonce:
+                    Number(record.nonce),
+
+                serverSeed:
+                    this.normalizeSeed(
+                        record.serverSeed
+                    ),
+
+                serverSeedHash:
+                    this.normalizeSeed(
+                        record.serverSeedHash
+                    )
+
+            }));
+
 
         let validHashes = 0;
 
         let invalidHashes = 0;
 
-        let totalHamming = 0;
+        normalized.forEach(record => {
+
+            if (
+                this.validateHash(
+                    record.serverSeed,
+                    record.serverSeedHash
+                )
+            ) {
+
+                validHashes++;
+
+            }
+            else {
+
+                invalidHashes++;
+
+            }
+
+        });
+
+
+        const transitions = [];
+
+        let hammingSum = 0;
 
         let hammingCount = 0;
 
-        records.forEach(
-            record => {
-
-                const hashCheck =
-                    this.verifyHash(
-                        record.serverSeed,
-                        record.serverSeedHash
-                    );
-
-                if (hashCheck.valid)
-                    validHashes++;
-                else
-                    invalidHashes++;
-
-            }
-        );
-
-
         for (
-            let i = 1;
-            i < records.length;
+            let i = 0;
+            i < normalized.length - 1;
             i++
         ) {
 
-            const comparison =
-                this.compareSeeds(
-                    records[i - 1],
-                    records[i]
+            const transition =
+                this.analyzeTransition(
+                    normalized[i],
+                    normalized[i + 1]
                 );
 
-            comparisons.push(
-                comparison
+            transitions.push(
+                transition
             );
 
             if (
-                comparison.hammingDistance !== null
+                Number.isFinite(
+                    transition.hamming
+                )
             ) {
 
-                totalHamming +=
-                    comparison.hammingDistance;
+                hammingSum +=
+                    transition.hamming;
 
                 hammingCount++;
 
@@ -509,143 +341,168 @@ class SeedLabService {
         }
 
 
-        const averageHamming =
-            hammingCount > 0
-                ? totalHamming /
-                  hammingCount
-                : null;
-
-
         return {
 
-            success: true,
+            total:
+                normalized.length,
 
-            records:
-                records.length,
+            validHashes,
 
-            validHashes:
-                validHashes,
-
-            invalidHashes:
-                invalidHashes,
+            invalidHashes,
 
             averageHamming:
-                averageHamming,
+                hammingCount
+                    ? hammingSum /
+                      hammingCount
+                    : 0,
 
-            comparisons:
-                comparisons
+            transitions
 
         };
 
-    }
+    },
 
 
-    /*
-    -------------------------------------------------
-    Rapport lisible
-    -------------------------------------------------
-    */
+    render(analysis) {
 
-    static createReport(
-        analysis
-    ) {
+        const total =
+            document.getElementById(
+                "seedLabTotal"
+            );
 
-        if (
-            !analysis ||
-            !analysis.success
-        ) {
+        const valid =
+            document.getElementById(
+                "seedLabValid"
+            );
 
-            return "Analyse impossible.";
+        const invalid =
+            document.getElementById(
+                "seedLabInvalid"
+            );
 
-        }
+        const average =
+            document.getElementById(
+                "seedLabHamming"
+            );
 
-        let report =
-            "SEED LAB\n\n";
+        const container =
+            document.getElementById(
+                "seedLabTransitions"
+            );
 
-        report +=
-            "Seeds analysés : " +
-            analysis.records +
-            "\n";
 
-        report +=
-            "Hashes valides : " +
-            analysis.validHashes +
-            "\n";
+        if (!container)
+            return;
 
-        report +=
-            "Hashes invalides : " +
-            analysis.invalidHashes +
-            "\n";
 
-        if (
-            analysis.averageHamming !== null
-        ) {
+        if (total)
+            total.textContent =
+                analysis.total;
 
-            report +=
-                "Distance Hamming moyenne : " +
+
+        if (valid)
+            valid.textContent =
+                analysis.validHashes;
+
+
+        if (invalid)
+            invalid.textContent =
+                analysis.invalidHashes;
+
+
+        if (average)
+            average.textContent =
                 analysis.averageHamming
                     .toFixed(2) +
-                " / 256\n";
+                " / 256";
+
+
+        if (
+            !analysis.transitions.length
+        ) {
+
+            container.innerHTML =
+                "Pas assez de seeds.";
+
+            return;
 
         }
 
-        report +=
-            "\nRELATIONS TESTÉES\n";
 
-        analysis.comparisons.forEach(
+        let html = "";
+
+
+        analysis.transitions.forEach(
             (item, index) => {
 
-                report +=
-                    "\nTransition " +
-                    (index + 1) +
-                    " : " +
-                    item.previousNonce +
-                    " → " +
-                    item.currentNonce +
-                    "\n";
+                html += `
 
-                report +=
-                    "Hamming : " +
-                    item.hammingDistance +
-                    "/256\n";
+                    <div class="seed-transition">
 
-                report +=
-                    "Caractères hex différents : " +
-                    item.hexDifference +
-                    "/64\n";
+                        <h4>
+                            Transition ${index + 1}
+                            :
+                            ${item.fromNonce}
+                            →
+                            ${item.toNonce}
+                        </h4>
 
-                report +=
-                    "SHA256(seed précédent) = seed suivant : " +
-                    (
-                        item.shaChain.matches
-                            ? "OUI"
-                            : "NON"
-                    ) +
-                    "\n";
+                        <div class="row">
+                            <span>Hamming</span>
+                            <span>
+                                ${item.hamming}/256
+                            </span>
+                        </div>
 
-                report +=
-                    "SHA256²(seed précédent) = seed suivant : " +
-                    (
-                        item.doubleSha.matches
-                            ? "OUI"
-                            : "NON"
-                    ) +
-                    "\n";
+                        <div class="row">
+                            <span>
+                                Caractères hex différents
+                            </span>
+                            <span>
+                                ${item.hexDifference}/64
+                            </span>
+                        </div>
 
-                report +=
-                    "HMAC-SHA256(seed précédent, nonce) = seed suivant : " +
-                    (
-                        item.hmacNonce.matches
-                            ? "OUI"
-                            : "NON"
-                    ) +
-                    "\n";
+                        <div class="row">
+                            <span>SHA-256</span>
+                            <span>
+                                ${item.sha256
+                                    ? "✅ OUI"
+                                    : "❌ NON"}
+                            </span>
+                        </div>
+
+                        <div class="row">
+                            <span>Double SHA-256</span>
+                            <span>
+                                ${item.doubleSHA256
+                                    ? "✅ OUI"
+                                    : "❌ NON"}
+                            </span>
+                        </div>
+
+                        <div class="row">
+                            <span>HMAC-SHA256</span>
+                            <span>
+                                ${item.hmac
+                                    ? "✅ OUI"
+                                    : "❌ NON"}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                `;
 
             }
         );
 
-        return report;
+
+        container.innerHTML =
+            html;
 
     }
 
-  }
+};
