@@ -22,74 +22,52 @@ class StorageService {
 
     static getHistory() {
 
-        try {
+    try {
 
-            const raw =
-                localStorage.getItem(
-                    this.KEY
-                );
+        const raw =
+            localStorage.getItem(this.KEY);
 
-            if (!raw)
-                return [];
-
-
-            const history =
-                JSON.parse(raw);
-
-
-            if (!Array.isArray(history))
-                return [];
-
-
-            /*
-            Compatibilité avec les anciennes analyses.
-
-            Ancien format :
-                hash
-
-            Nouveau format :
-                serverSeedHash
-            */
-
-            return history.map(item => ({
-
-                ...item,
-
-                serverSeed:
-                    item.serverSeed || "",
-
-                serverSeedHash:
-                    item.serverSeedHash ||
-                    item.hash ||
-                    "",
-
-                hash:
-                    item.hash ||
-                    item.serverSeedHash ||
-                    "",
-
-                clientSeed:
-                    item.clientSeed || "",
-
-                url:
-                    item.url || ""
-
-            }));
-
-        }
-
-        catch (e) {
-
-            console.error(
-                "Erreur lecture historique :",
-                e
-            );
-
+        if (!raw)
             return [];
 
-        }
+        const history =
+            JSON.parse(raw);
+
+        if (!Array.isArray(history))
+            return [];
+
+        /*
+        ==========================================
+        MIGRATION ANCIEN HASH → serverSeedHash
+        ==========================================
+        */
+
+        return history.map(item => ({
+
+            ...item,
+
+            serverSeedHash:
+                item.serverSeedHash ||
+                item.hash ||
+                ""
+
+        }));
 
     }
+
+    catch (e) {
+
+        console.error(
+            "Erreur lecture historique :",
+            e
+        );
+
+        return [];
+
+    }
+
+    }
+
 
 
     /*
