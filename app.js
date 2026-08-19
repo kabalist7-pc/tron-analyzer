@@ -200,8 +200,74 @@ function clearHistory(){
     ChiSquareService.refresh();
 
     KolmogorovSmirnovService.refresh();
+    /*
+=================================================
+SEED LAB
+Actualisation après chaque nouvelle analyse
+=================================================
+*/
+
+try {
+
+    const history =
+        StorageService.getHistory();
+
+    const seedRecords =
+        history
+            .filter(item =>
+                item.serverSeed &&
+                (
+                    item.serverSeedHash ||
+                    item.hash
+                )
+            )
+            .map(item => ({
+
+                nonce:
+                    Number(item.nonce),
+
+                serverSeed:
+                    item.serverSeed,
+
+                serverSeedHash:
+                    item.serverSeedHash ||
+                    item.hash,
+
+                clientSeed:
+                    item.clientSeed || "",
+
+                result:
+                    Number(item.result)
+
+            }))
+            .sort(
+                (a, b) =>
+                    a.nonce - b.nonce
+            );
+
+    if (seedRecords.length >= 2) {
+
+        const seedAnalysis =
+            SeedLabService.analyzeSeries(
+                seedRecords
+            );
+
+        SeedLabService.render(
+            seedAnalysis
+        );
+
+    }
 
 }
+catch (error) {
+
+    console.error(
+        "Erreur Seed Lab :",
+        error
+    );
+
+}
+
 function logGamma(z) {
 
     const coefficients = [
