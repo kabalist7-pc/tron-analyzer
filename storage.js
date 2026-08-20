@@ -1,7 +1,7 @@
 /*
 =====================================================
 TRON ANALYZER
-Version : 2.1
+Version : 2.2
 Fichier : storage.js
 Compatible Seed Lab V3
 =====================================================
@@ -16,58 +16,92 @@ class StorageService {
 
     /*
     =================================================
+    CALCULER SHA-256 DU SERVER SEED
+    =================================================
+    */
+
+    static async calculateServerSeedHash(serverSeed) {
+
+        if (!serverSeed)
+            return "";
+
+        const encoder =
+            new TextEncoder();
+
+        const data =
+            encoder.encode(serverSeed);
+
+        const hashBuffer =
+            await crypto.subtle.digest(
+                "SHA-256",
+                data
+            );
+
+        const hashArray =
+            Array.from(
+                new Uint8Array(hashBuffer)
+            );
+
+        return hashArray
+            .map(byte =>
+                byte
+                    .toString(16)
+                    .padStart(2, "0")
+            )
+            .join("");
+
+    }
+
+
+    /*
+    =================================================
     RÉCUPÉRER L'HISTORIQUE
     =================================================
     */
 
     static getHistory() {
 
-    try {
+        try {
 
-        const raw =
-            localStorage.getItem(this.KEY);
+            const raw =
+                localStorage.getItem(
+                    this.KEY
+                );
 
-        if (!raw)
+            if (!raw)
+                return [];
+
+            const history =
+                JSON.parse(raw);
+
+            if (!Array.isArray(history))
+                return [];
+
+            return history.map(item => ({
+
+                ...item,
+
+                serverSeedHash:
+                    item.serverSeedHash ||
+                    item.hash ||
+                    ""
+
+            }));
+
+        }
+
+        catch (e) {
+
+            console.error(
+                "Erreur lecture historique :",
+                e
+            );
+
             return [];
 
-        const history =
-            JSON.parse(raw);
-
-        if (!Array.isArray(history))
-            return [];
-
-        /*
-        ==========================================
-        MIGRATION ANCIEN HASH → serverSeedHash
-        ==========================================
-        */
-
-        return history.map(item => ({
-
-            ...item,
-
-            serverSeedHash:
-                item.serverSeedHash ||
-                item.hash ||
-                ""
-
-        }));
+        }
 
     }
-
-    catch (e) {
-
-        console.error(
-            "Erreur lecture historique :",
-            e
-        );
-
-        return [];
-
-    }
-
-    }
-
 
 
     /*
@@ -76,14 +110,16 @@ class StorageService {
     =================================================
     */
 
-    static saveAnalysis(data) {
+    static async saveAnalysis(data) {
 
         const history =
             this.getHistory();
 
 
         /*
-        Évite les doublons
+        =============================================
+        ÉVITER LES DOUBLONS
+        =============================================
         */
 
         const exists =
@@ -100,11 +136,55 @@ class StorageService {
             return;
 
 
-        const serverSeedHash =
+        /*
+        =============================================
+        HASH FOURNI OU CALCULÉ
+        =============================================
+        */
+
+        let serverSeedHash =
             data.serverSeedHash ||
             data.hash ||
             "";
 
+
+        /*
+        Si aucun hash n'est présent,
+        calcul du SHA-256 du Server Seed.
+        */
+
+        if (
+            !serverSeedHash &&
+            data.serverSeed
+        ) {
+
+            try {
+
+                serverSeedHash =
+                    await this
+                        .calculateServerSeedHash(
+                            data.serverSeed
+                        );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Erreur calcul SHA-256 :",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /*
+        =============================================
+        ENREGISTREMENT
+        =============================================
+        */
 
         history.unshift({
 
@@ -127,9 +207,7 @@ class StorageService {
                 data.clientSeed || "",
 
             /*
-            On conserve également
-            l'ancien champ hash
-            pour compatibilité.
+            Compatibilité ancienne version
             */
 
             hash:
@@ -162,7 +240,7 @@ class StorageService {
     =================================================
     */
 
-    static importHistory(rows) {
+    static async importHistory(rows) {
 
         const history =
             this.getHistory();
@@ -170,7 +248,9 @@ class StorageService {
         let imported = 0;
 
 
-        rows.forEach(data => {
+        for (
+            const data of rows
+        ) {
 
             const exists =
                 history.find(item =>
@@ -183,13 +263,44 @@ class StorageService {
 
 
             if (exists)
-                return;
+                continue;
 
 
-            const serverSeedHash =
+            let serverSeedHash =
                 data.serverSeedHash ||
                 data.hash ||
                 "";
+
+
+            /*
+            Calcul automatique si nécessaire
+            */
+
+            if (
+                !serverSeedHash &&
+                data.serverSeed
+            ) {
+
+                try {
+
+                    serverSeedHash =
+                        await this
+                            .calculateServerSeedHash(
+                                data.serverSeed
+                            );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Erreur hash CSV :",
+                        error
+                    );
+
+                }
+
+            }
 
 
             history.push({
@@ -227,7 +338,7 @@ class StorageService {
 
             imported++;
 
-        });
+        }
 
 
         localStorage.setItem(
@@ -273,4 +384,4 @@ class StorageService {
 
     }
 
-        }
+}
