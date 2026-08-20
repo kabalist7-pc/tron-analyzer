@@ -1,7 +1,7 @@
-/*
+   /*
 =====================================================
 TRON ANALYZER
-Version : 5.1
+Version : 5.2
 Fichier : app.js
 Architecture Core V2
 =====================================================
@@ -26,6 +26,7 @@ function refreshHistory() {
 
     if (!container)
         return;
+
 
     const history =
         StorageService.getHistory();
@@ -53,7 +54,10 @@ function refreshHistory() {
     */
 
     const searchInput =
-        document.getElementById("searchNonce");
+        document.getElementById(
+            "searchNonce"
+        );
+
 
     const search =
         searchInput
@@ -65,13 +69,21 @@ function refreshHistory() {
 
     const filteredHistory =
         history.filter(item =>
+
             String(item.nonce)
                 .toLowerCase()
                 .includes(search)
+
         );
 
 
-    if (filteredHistory.length === 0) {
+    /*
+    Aucun résultat
+    */
+
+    if (
+        filteredHistory.length === 0
+    ) {
 
         container.innerHTML =
             search === ""
@@ -83,6 +95,10 @@ function refreshHistory() {
     }
 
 
+    /*
+    Construction de l'historique
+    */
+
     let html = "";
 
 
@@ -90,21 +106,33 @@ function refreshHistory() {
 
         html += `
 
-        <div class="history-item"
-             onclick="loadHistory('${item.nonce}')">
+        <div
+            class="history-item"
+            onclick="loadHistory('${item.nonce}')"
+        >
 
             <div class="history-title">
+
                 🎲 ${item.game}
+
             </div>
 
-            Nonce : ${item.nonce}<br>
+            Nonce :
+            ${item.nonce}
 
-            Résultat : ${item.result}<br>
+            <br>
+
+            Résultat :
+            ${item.result}
+
+            <br>
 
             <div class="history-date">
+
                 ${new Date(
                     item.createdAt
                 ).toLocaleString()}
+
             </div>
 
         </div>
@@ -134,8 +162,10 @@ function loadHistory(nonce) {
 
     const item =
         history.find(h =>
+
             String(h.nonce) ===
             String(nonce)
+
         );
 
 
@@ -144,12 +174,17 @@ function loadHistory(nonce) {
 
 
     const input =
-        document.getElementById("pfLink");
+        document.getElementById(
+            "pfLink"
+        );
 
 
-    if (input)
-        input.value =
-            item.url;
+    if (!input)
+        return;
+
+
+    input.value =
+        item.url;
 
 
     analyse();
@@ -200,6 +235,10 @@ async function analyse() {
         input.value.trim();
 
 
+    /*
+    Aucun lien
+    */
+
     if (!link) {
 
         if (verification) {
@@ -229,20 +268,24 @@ async function analyse() {
 
         /*
         =============================================
-        ERREUR
+        VÉRIFICATION DU RÉSULTAT
         =============================================
         */
 
-        if (!analysis ||
-            !analysis.success) {
+        if (
+            !analysis ||
+            !analysis.success
+        ) {
 
             if (verification) {
 
                 verification.innerHTML =
                     "❌ " +
                     (
-                        analysis?.error ||
-                        "Erreur inconnue."
+                        analysis &&
+                        analysis.error
+                            ? analysis.error
+                            : "Erreur inconnue."
                     );
 
             }
@@ -254,24 +297,34 @@ async function analyse() {
 
         /*
         =============================================
-        AFFICHAGE
+        AFFICHAGE DES INFORMATIONS
         =============================================
         */
 
         const game =
-            document.getElementById("game");
+            document.getElementById(
+                "game"
+            );
 
         const nonce =
-            document.getElementById("nonce");
+            document.getElementById(
+                "nonce"
+            );
 
         const server =
-            document.getElementById("server");
+            document.getElementById(
+                "server"
+            );
 
         const client =
-            document.getElementById("client");
+            document.getElementById(
+                "client"
+            );
 
         const hash =
-            document.getElementById("hash");
+            document.getElementById(
+                "hash"
+            );
 
 
         if (game)
@@ -301,7 +354,7 @@ async function analyse() {
 
         /*
         =============================================
-        RÉSULTAT
+        AFFICHAGE DU RÉSULTAT
         =============================================
         */
 
@@ -326,19 +379,71 @@ async function analyse() {
         =============================================
         */
 
-        StorageService.saveAnalysis(
-            analysis
-        );
+        await StorageService
+            .saveAnalysis(
+                analysis
+            );
 
 
         /*
         =============================================
-        ACTUALISATION
+        ACTUALISATION HISTORIQUE
         =============================================
         */
 
         refreshHistory();
 
+
+        /*
+        =============================================
+        STATISTIQUES
+        =============================================
+        */
+
+        refreshAllStatistics();
+
+
+        /*
+        =============================================
+        SEED LAB
+        =============================================
+        */
+
+        refreshSeedLab();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Erreur pendant l'analyse :",
+            error
+        );
+
+
+        if (verification) {
+
+            verification.innerHTML =
+
+                "❌ Erreur pendant l'analyse : " +
+                error.message;
+
+        }
+
+    }
+
+}
+
+
+/*
+=====================================================
+ACTUALISATION DES STATISTIQUES
+=====================================================
+*/
+
+function refreshAllStatistics() {
+
+    try {
 
         if (
             typeof StatisticsService !==
@@ -384,33 +489,14 @@ async function analyse() {
 
         }
 
-
-        /*
-        =============================================
-        SEED LAB
-        =============================================
-        */
-
-        refreshSeedLab();
-
     }
 
     catch (error) {
 
         console.error(
-            "Erreur analyse :",
+            "Erreur statistiques :",
             error
         );
-
-
-        if (verification) {
-
-            verification.innerHTML =
-
-                "❌ Erreur pendant l'analyse : " +
-                error.message;
-
-        }
 
     }
 
@@ -427,12 +513,11 @@ function refreshSeedLab() {
 
     try {
 
-        if (
-            typeof StorageService ===
-            "undefined"
-        )
-            return;
-
+        /*
+        =============================================
+        VÉRIFIER QUE LE SERVICE EXISTE
+        =============================================
+        */
 
         if (
             typeof SeedLabService ===
@@ -448,48 +533,34 @@ function refreshSeedLab() {
         }
 
 
+        /*
+        =============================================
+        RÉCUPÉRER L'HISTORIQUE
+        =============================================
+        */
+
         const history =
             StorageService.getHistory();
 
 
-        if (
-            !Array.isArray(history) ||
-            history.length < 2
-        ) {
-
-            const container =
-                document.getElementById(
-                    "seedLabTransitions"
-                );
-
-
-            if (container) {
-
-                container.innerHTML =
-                    "Pas assez de seeds.";
-
-            }
-
-            return;
-
-        }
-
-
         /*
-        ==========================================
-        EXTRACTION DES SEEDS
-        ==========================================
+        =============================================
+        EXTRAIRE LES SEEDS
+        =============================================
         */
 
         const seedRecords =
             history
 
                 .filter(item =>
+
                     item.serverSeed &&
+
                     (
                         item.serverSeedHash ||
                         item.hash
                     )
+
                 )
 
                 .map(item => ({
@@ -513,9 +584,12 @@ function refreshSeedLab() {
                 }))
 
                 .filter(item =>
+
+                    item.serverSeed &&
                     Number.isFinite(
                         item.nonce
                     )
+
                 )
 
                 .sort(
@@ -523,6 +597,32 @@ function refreshSeedLab() {
                         a.nonce - b.nonce
                 );
 
+
+        /*
+        =============================================
+        METTRE À JOUR LE COMPTEUR
+        =============================================
+        */
+
+        const total =
+            document.getElementById(
+                "seedLabTotal"
+            );
+
+
+        if (total) {
+
+            total.textContent =
+                seedRecords.length;
+
+        }
+
+
+        /*
+        =============================================
+        PAS ASSEZ DE SEEDS
+        =============================================
+        */
 
         if (
             seedRecords.length < 2
@@ -541,15 +641,16 @@ function refreshSeedLab() {
 
             }
 
+
             return;
 
         }
 
 
         /*
-        ==========================================
+        =============================================
         ANALYSE
-        ==========================================
+        =============================================
         */
 
         const seedAnalysis =
@@ -560,9 +661,9 @@ function refreshSeedLab() {
 
 
         /*
-        ==========================================
+        =============================================
         AFFICHAGE
-        ==========================================
+        =============================================
         */
 
         SeedLabService.render(
@@ -591,67 +692,30 @@ VIDER L'HISTORIQUE
 
 function clearHistory() {
 
-    if (
-        !confirm(
+    const confirmation =
+        confirm(
             "Voulez-vous vraiment supprimer tout l'historique ?"
-        )
-    ) {
+        );
 
+
+    if (!confirmation)
         return;
 
-    }
 
+    /*
+    Suppression
+    */
 
     StorageService.clearHistory();
 
 
+    /*
+    Actualisation
+    */
+
     refreshHistory();
 
-
-    if (
-        typeof StatisticsService !==
-        "undefined"
-    ) {
-
-        StatisticsService.refresh();
-
-        StatisticsService
-            .refreshDistribution();
-
-    }
-
-
-    if (
-        typeof AdvancedStatisticsService !==
-        "undefined"
-    ) {
-
-        AdvancedStatisticsService
-            .refresh();
-
-    }
-
-
-    if (
-        typeof ChiSquareService !==
-        "undefined"
-    ) {
-
-        ChiSquareService.refresh();
-
-    }
-
-
-    if (
-        typeof KolmogorovSmirnovService !==
-        "undefined"
-    ) {
-
-        KolmogorovSmirnovService
-            .refresh();
-
-    }
-
+    refreshAllStatistics();
 
     refreshSeedLab();
 
@@ -689,17 +753,25 @@ function logGamma(z) {
 
     if (z < 0.5) {
 
-        return Math.log(Math.PI) -
+        return (
+
+            Math.log(Math.PI)
+
+            -
 
             Math.log(
                 Math.sin(
                     Math.PI * z
                 )
-            ) -
+            )
+
+            -
 
             logGamma(
                 1 - z
-            );
+            )
+
+        );
 
     }
 
@@ -786,6 +858,12 @@ function gammaQ(a, x) {
         1000;
 
 
+    /*
+    =============================================
+    Série
+    =============================================
+    */
+
     if (x < a + 1) {
 
         let sum =
@@ -796,7 +874,8 @@ function gammaQ(a, x) {
             sum;
 
 
-        let n = 1;
+        let n =
+            1;
 
 
         while (
@@ -827,10 +906,14 @@ function gammaQ(a, x) {
 
         const logTerm =
 
-            -x +
+            -x
+
+            +
 
             a *
-            Math.log(x) -
+            Math.log(x)
+
+            -
 
             logGamma(a);
 
@@ -846,6 +929,12 @@ function gammaQ(a, x) {
 
     }
 
+
+    /*
+    =============================================
+    Fraction continue
+    =============================================
+    */
 
     let b =
         x + 1 - a;
@@ -924,17 +1013,25 @@ function gammaQ(a, x) {
 
     const logTerm =
 
-        -x +
+        -x
+
+        +
 
         a *
-        Math.log(x) -
+        Math.log(x)
+
+        -
 
         logGamma(a);
 
 
     return (
-        Math.exp(logTerm) *
+
+        Math.exp(
+            logTerm
+        ) *
         h
+
     );
 
 }
@@ -958,11 +1055,16 @@ function chiSquareCDF(
         return NaN;
 
 
-    return 1 -
+    return (
+
+        1 -
+
         gammaQ(
             degreesOfFreedom / 2,
             chiSquare / 2
-        );
+        )
+
+    );
 
 }
 
@@ -978,78 +1080,36 @@ window.onload = function () {
     try {
 
         /*
-        ==========================================
+        =============================================
         HISTORIQUE
-        ==========================================
+        =============================================
         */
 
         refreshHistory();
 
 
         /*
-        ==========================================
+        =============================================
         STATISTIQUES
-        ==========================================
+        =============================================
         */
 
-        if (
-            typeof StatisticsService !==
-            "undefined"
-        ) {
-
-            StatisticsService.refresh();
-
-            StatisticsService
-                .refreshDistribution();
-
-        }
-
-
-        if (
-            typeof AdvancedStatisticsService !==
-            "undefined"
-        ) {
-
-            AdvancedStatisticsService
-                .refresh();
-
-        }
-
-
-        if (
-            typeof ChiSquareService !==
-            "undefined"
-        ) {
-
-            ChiSquareService.refresh();
-
-        }
-
-
-        if (
-            typeof KolmogorovSmirnovService !==
-            "undefined"
-        ) {
-
-            KolmogorovSmirnovService
-                .refresh();
-
-        }
+        refreshAllStatistics();
 
 
         /*
-        ==========================================
+        =============================================
         SEED LAB
-        ==========================================
+        =============================================
         */
 
         refreshSeedLab();
 
 
         /*
-        ==========================================
-        SIMULATION / DEBUG
-        ==========================================
+        =============================================
+        SIMULATION DE TEST
+        =============================================
         */
 
         if (
@@ -1057,120 +1117,159 @@ window.onload = function () {
             "undefined"
         ) {
 
-            const simulation =
-                DiceSimulatorService
-                    .generate(1000);
+            try {
+
+                const simulation =
+                    DiceSimulatorService
+                        .generate(1000);
 
 
-            const results =
-                simulation.results.map(
-                    item =>
-                        Number(item.result)
-                );
+                const results =
+                    simulation.results
+                        .map(item =>
+                            Number(item.result)
+                        );
 
 
-            const total =
-                results.length;
+                const total =
+                    results.length;
 
 
-            if (total > 0) {
+                if (total > 0) {
 
-                const sum =
-                    results.reduce(
-                        (acc, value) =>
-                            acc + value,
-                        0
+                    const sum =
+                        results.reduce(
+                            (acc, value) =>
+                                acc + value,
+                            0
+                        );
+
+
+                    const average =
+                        sum / total;
+
+
+                    const minimum =
+                        Math.min(
+                            ...results
+                        );
+
+
+                    const maximum =
+                        Math.max(
+                            ...results
+                        );
+
+
+                    const bins = [
+
+                        0, 0, 0, 0, 0,
+
+                        0, 0, 0, 0, 0
+
+                    ];
+
+
+                    results.forEach(
+                        value => {
+
+                            let index =
+                                Math.floor(
+                                    value / 10
+                                );
+
+
+                            if (
+                                index >= 10
+                            ) {
+
+                                index = 9;
+
+                            }
+
+
+                            bins[index]++;
+
+                        }
                     );
 
 
-                const average =
-                    sum / total;
+                    const expected =
+                        total / 10;
 
 
-                const minimum =
-                    Math.min(
-                        ...results
+                    let chiSquare =
+                        0;
+
+
+                    bins.forEach(
+                        observed => {
+
+                            chiSquare +=
+
+                                Math.pow(
+                                    observed -
+                                    expected,
+                                    2
+                                ) /
+                                expected;
+
+                        }
                     );
 
 
-                const maximum =
-                    Math.max(
-                        ...results
+                    const degreesOfFreedom =
+                        9;
+
+
+                    const pValue =
+                        1 -
+                        chiSquareCDF(
+                            chiSquare,
+                            degreesOfFreedom
+                        );
+
+
+                    /*
+                    Ne pas afficher de popup.
+                    Seulement journaliser.
+                    */
+
+                    console.log(
+                        "Simulation Tron Analyzer",
+                        {
+                            source:
+                                simulation.source,
+
+                            game:
+                                simulation.game,
+
+                            total,
+
+                            average,
+
+                            minimum,
+
+                            maximum,
+
+                            chiSquare,
+
+                            degreesOfFreedom,
+
+                            pValue
+
+                        }
                     );
 
+                }
 
-                const bins = [
+            }
 
-                    0, 0, 0, 0, 0,
+            catch (simulationError) {
 
-                    0, 0, 0, 0, 0
-
-                ];
-
-
-                results.forEach(
-                    value => {
-
-                        let index =
-                            Math.floor(
-                                value / 10
-                            );
-
-
-                        if (
-                            index >= 10
-                        )
-                            index = 9;
-
-
-                        bins[index]++;
-
-                    }
-                );
-
-
-                const expected =
-                    total / 10;
-
-
-                let chiSquare = 0;
-
-
-                bins.forEach(
-                    observed => {
-
-                        chiSquare +=
-
-                            Math.pow(
-                                observed -
-                                expected,
-                                2
-                            ) /
-                            expected;
-
-                    }
-                );
-
-
-                const degreesOfFreedom =
-                    9;
-
-
-                const pValue =
-                    1 -
-                    chiSquareCDF(
-                        chiSquare,
-                        degreesOfFreedom
-                    );
-
-
-                console.log(
-                    "DEBUG CHI CARRÉ",
-                    {
-                        chiSquare,
-                        degreesOfFreedom,
-                        pValue
-                    }
+                console.error(
+                    "Erreur simulation :",
+                    simulationError
                 );
 
             }
