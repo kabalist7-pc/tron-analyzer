@@ -66,22 +66,13 @@ class AnalysisService {
 
     serverSeed: data.serverSeed,
 
-    serverSeedHash:
-        data.serverSeedHash ||
-        data.hash ||
-        "",
-
     clientSeed: data.clientSeed,
 
-    hash:
-        data.serverSeedHash ||
-        data.hash ||
-        "",
+    hash: data.hash,
 
     url: data.url,
 
-    createdAt:
-        data.createdAt,
+    createdAt: data.createdAt,
 
     details: dice
 
