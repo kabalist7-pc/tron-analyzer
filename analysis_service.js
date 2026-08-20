@@ -56,27 +56,36 @@ class AnalysisService {
 
         const analysis = {
 
-            success: true,
+    success: true,
 
-            game: data.game,
+    game: data.game,
 
-            nonce: data.nonce,
+    nonce: data.nonce,
 
-            result: dice.dice,
+    result: dice.dice,
 
-            serverSeed: data.serverSeed,
+    serverSeed: data.serverSeed,
 
-            clientSeed: data.clientSeed,
+    serverSeedHash:
+        data.serverSeedHash ||
+        data.hash ||
+        "",
 
-            hash: data.hash,
+    clientSeed: data.clientSeed,
 
-            url: data.url,
+    hash:
+        data.serverSeedHash ||
+        data.hash ||
+        "",
 
-            createdAt: data.createdAt,
+    url: data.url,
 
-            details: dice
+    createdAt:
+        data.createdAt,
 
-        };
+    details: dice
+
+};
 
         return analysis;
 
